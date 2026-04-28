@@ -1,0 +1,8 @@
+{% load static %}
+{% for room in all_rooms %}
+  {% if room.MaPhong in rooms_with_shows %}
+    <a href="javascript:void(0)" onclick="selectRoom('{{ room.MaPhong }}')" data-room="{{ room.MaPhong }}" class="room-item {% if room.MaPhong|stringformat:'i' == selected_room_id %}active{% endif %}">{{ room.TenPhong }}</a>
+  {% else %}
+    <div class="room-item disabled">{{ room.TenPhong }}</div>
+  {% endif %}
+{% endfor %}

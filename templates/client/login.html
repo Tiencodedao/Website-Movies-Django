@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html><html lang="vi"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập - Movies Vietnam</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+<link rel="stylesheet" href="{% static 'client/css/login.css' %}">
+<link rel="icon" href="{% static 'client/img/logo_web.jpg' %}" type="image/x-icon">
+<style>body{background:url("{% static 'client/img/login.jpg' %}") center/cover no-repeat fixed;min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.error-msg{color:#ff4d4d;font-size:.85rem;margin-top:6px;display:block;}</style>
+</head><body>
+<header><a href="{% url 'index' %}" class="logo"><i class="bx bx-movie"></i> Movies</a>
+<div class="bx bx-menu" id="menu-icon"></div>
+<ul class="navbar"><li><a href="{% url 'index' %}">Trang chủ</a></li><li><a href="{% url 'movie_list' %}">Phim</a></li></ul></header>
+
+<div class="container {% if active_tab == 'register' %}active{% endif %}" id="container">
+  <div class="form-container sign-up">
+    <form method="POST">{% csrf_token %}<input type="hidden" name="action" value="register">
+      <h1>Tạo Tài Khoản</h1>
+      <div class="social-icons"><a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a><a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a></div>
+      <span>hoặc sử dụng email để đăng ký</span>
+      <input type="text" name="name" placeholder="Họ tên" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="password" name="password" placeholder="Mật khẩu" required>
+      {% if register_error %}<span class="error-msg">{{ register_error }}</span>{% endif %}
+      <button type="submit">Đăng ký</button>
+    </form>
+  </div>
+  <div class="form-container sign-in">
+    <form method="POST">{% csrf_token %}<input type="hidden" name="action" value="login">
+      <h1>Đăng nhập</h1>
+      <div class="social-icons"><a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a><a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a></div>
+      <span>hoặc sử dụng email của bạn</span>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="password" name="password" placeholder="Mật khẩu" required>
+      <a href="#">Quên mật khẩu?</a>
+      {% if login_error %}<span class="error-msg">{{ login_error }}</span>{% endif %}
+      <button type="submit">Đăng nhập</button>
+    </form>
+  </div>
+  <div class="toggle-container"><div class="toggle">
+    <div class="toggle-panel toggle-left"><h1>Chào mừng trở lại!</h1><p>Nhập thông tin để đăng nhập</p><button class="hidden" id="login">Đăng nhập</button></div>
+    <div class="toggle-panel toggle-right"><h1>Chào bạn!</h1><p>Đăng ký để sử dụng đầy đủ tính năng</p><button class="hidden" id="register">Đăng ký</button></div>
+  </div></div>
+</div>
+<script src="{% static 'client/js/login.js' %}"></script>
+</body></html>

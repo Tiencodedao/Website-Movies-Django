@@ -1,0 +1,123 @@
+ 
+.form-widget {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    margin: 30px auto;
+}
+
+.widget-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #342e37;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #1775f1; /* Màu viền khi focus */
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.form-group input[type="file"] {
+    padding: 5px;
+}
+
+.error-message {
+    color: red;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.btn-submit {
+    background-color: #1775f1;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+    background-color: #0c5fcd;
+}
+
+@media screen and (max-width: 768px) {
+    .form-widget {
+        padding: 20px;
+    }
+
+    .widget-title {
+        font-size: 1.2rem;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 0.9rem;
+    }
+
+    .btn-submit {
+        font-size: 1rem;
+    }
+}
+/* Định dạng cho widget header */
+.widget-header {
+    text-align: right;
+    margin: 20px 0;
+}
+
+/* Định dạng cho nút "Thêm phim mới" */
+.btn-add-movie {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color:#0d6efd; /* Màu nền xanh */
+    color: white; /* Màu chữ trắng */
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 10px; /* Bo góc */
+    transition: background-color 0.3s ease;
+}
+
+/* Hiệu ứng khi hover */
+.btn-add-movie:hover {
+    background-color: #0d6efd; /* Màu nền khi hover */
+}

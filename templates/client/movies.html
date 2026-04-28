@@ -1,0 +1,79 @@
+{% extends 'client/base.html' %}
+{% load static %}
+{% block title %}Phim - Movies Vietnam{% endblock %}
+
+{% block content %}
+
+<!-- Hero Swiper (giống PHP gốc) -->
+<section class="home swiper" id="home">
+  <div class="swiper-wrapper">
+    <div class="swiper-slide container">
+      <img src="{% static 'client/img/home3.jpg' %}" alt="Movie Image">
+      <div class="home-text">
+        <span>Marvel Universe</span>
+        <h1>Spider-Man: <br> Far from Home</h1>
+        <a href="{% url 'movie_list' %}" class="btn">Book Now</a>
+        <a href="https://youtu.be/JfVOs4VSpmA" class="play"><i class="bx bx-play"></i></a>
+      </div>
+    </div>
+    <div class="swiper-slide container">
+      <img src="{% static 'client/img/home2.jpg' %}" alt="">
+      <div class="home-text">
+        <span>Marvel Universe</span>
+        <h1>Avengers: <br> Infinity War</h1>
+        <a href="{% url 'movie_list' %}" class="btn">Book Now</a>
+        <a href="#" class="play"><i class="bx bx-play"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="swiper-pagination"></div>
+</section>
+
+<!-- Filter Form (giống PHP gốc: section.newsletter.filter-form-container) -->
+<section class="newsletter filter-form-container">
+  <h2>Chọn thể loại phim bạn muốn xem</h2>
+  <form method="GET" action="{% url 'movie_list' %}" class="filter-form">
+    <input type="text" value="Lọc theo thể loại:" disabled class="filter-label">
+    <select name="filter" id="filter" class="filter-select">
+      <option value="">Tất cả</option>
+      {% for g in genres %}
+        <option value="{{ g.TenTL }}" {% if filter_name == g.TenTL %}selected{% endif %}>
+          {{ g.TenTL }}
+        </option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="LỌC" class="btn filter-button">
+  </form>
+</section>
+
+<!-- Danh sách phim nhóm theo thể loại -->
+<section class="movies" id="movies">
+  {% if genres_with_movies %}
+    {% for item in genres_with_movies %}
+      <h2 class="heading">Danh sách phim {{ item.genre_name }}</h2>
+      <div class="movies-container">
+        {% for movie in item.movies %}
+        <div class="box">
+          <div class="box-img">
+            <a href="{% url 'movie_detail' movie.MaPhim %}">
+              {% if movie.Hinh %}
+                <img src="{% static 'admin/img/uploads/' %}{{ movie.Hinh }}" alt="{{ movie.TenPhim }}" loading="lazy">
+              {% else %}
+                <div style="width:100%;height:270px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;">
+                  <i class="bx bx-film" style="font-size:3rem;color:rgba(255,255,255,.2)"></i>
+                </div>
+              {% endif %}
+            </a>
+          </div>
+          <h3>{{ movie.TenPhim }}</h3>
+          <span>{% if movie.ThoiLuong %}{{ movie.ThoiLuong }} min | {% else %}120 min | {% endif %}{{ movie.MaTL.TenTL }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <h2 class="heading">Không tìm thấy phim phù hợp</h2>
+  {% endif %}
+</section>
+
+{% endblock %}

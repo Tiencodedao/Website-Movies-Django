@@ -1,0 +1,57 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Quản lý suất chiếu - CinemaAdmin{% endblock %}
+
+{% block content %}
+<h1 class="title">Quản lý suất chiếu</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">Suất chiếu</a></li>
+</ul>
+
+<div class="data">
+  <div class="content-data">
+    <div class="head" style="display:flex; justify-content:space-between; align-items:center;">
+      <h3>Danh sách suất chiếu</h3>
+      <a href="{% url 'admin_create_show' %}" style="padding:8px 16px; border-radius:6px; background:#4CAF50; color:white; text-decoration:none; display:flex; align-items:center; gap:6px;">
+        <i class='bx bx-plus'></i> Thêm suất chiếu
+      </a>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Phim</th><th>Phòng</th><th>Ngày chiếu</th><th>Giờ bắt đầu</th><th>Giá vé</th><th>Thao tác</th></tr>
+        </thead>
+        <tbody>
+          {% for s in shows %}
+          <tr>
+            <td>{{ s.MaSuatChieu }}</td>
+            <td style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ s.MaPhim.TenPhim }}"><strong>{{ s.MaPhim.TenPhim }}</strong></td>
+            <td>{{ s.MaPhong.TenPhong }}</td>
+            <td>{{ s.NgayChieu|date:"d/m/Y" }}</td>
+            <td><code style="background:#f0f4f8;padding:3px 8px;border-radius:4px;font-size:.85rem;color:#333;border:1px solid #e2e8f0;">{{ s.GioBatDau|time:"H:i" }}</code></td>
+            <td><strong style="color:#0d6efd">{{ s.GiaVe|floatformat:0 }}đ</strong></td>
+            <td>
+              <div style="display:flex; gap:6px;">
+                <a href="{% url 'admin_edit_show' s.MaSuatChieu %}" class="btn-action btn-edit" title="Sửa"><i class='bx bx-edit'></i></a>
+                <a href="{% url 'admin_delete_show' s.MaSuatChieu %}" class="btn-action btn-delete" title="Xóa" onclick="return confirm('Xóa suất chiếu này?')"><i class='bx bx-trash'></i></a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" style="text-align:center; padding:20px; color:#999;">Chưa có suất chiếu</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if shows.has_other_pages %}
+    <div style="display:flex; gap:8px; margin-top:20px; justify-content:center;">
+      {% if shows.has_previous %}<a href="?page={{ shows.previous_page_number }}" class="btn-action">‹</a>{% endif %}
+      {% for p in shows.paginator.page_range %}<a href="?page={{ p }}" class="btn-action {% if p == shows.number %}btn-edit{% endif %}">{{ p }}</a>{% endfor %}
+      {% if shows.has_next %}<a href="?page={{ shows.next_page_number }}" class="page-btn">›</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

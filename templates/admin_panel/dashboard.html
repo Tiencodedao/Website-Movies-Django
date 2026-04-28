@@ -1,0 +1,284 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Dashboard - CinemaAdmin{% endblock %}
+
+{% block content %}
+<h1 class="title">Dashboard</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">Dashboard</a></li>
+</ul>
+
+<!-- CARDS (giống PHP gốc: 4 cards với progress bar) -->
+<div class="info-data">
+
+  <div class="card">
+    <div class="head">
+      <div>
+        <h2>{{ total_bills }}</h2>
+        <p>Vé đã bán</p>
+      </div>
+      <i class='bx bxs-shopping-bag icon'></i>
+    </div>
+    <span class="progress" data-value="80%"></span>
+    <span class="label"><a href="{% url 'admin_bills' %}">Quản lý hóa đơn →</a></span>
+  </div>
+
+  <div class="card">
+    <div class="head">
+      <div>
+        <h2>{{ total_movies }}</h2>
+        <p>Phim đang chiếu</p>
+      </div>
+      <i class='bx bxs-film icon'></i>
+    </div>
+    <span class="progress" data-value="95%"></span>
+    <span class="label"><a href="{% url 'admin_movies' %}">Quản lý phim →</a></span>
+  </div>
+
+  <div class="card">
+    <div class="head">
+      <div>
+        <h2>{{ total_users }}</h2>
+        <p>Tài khoản</p>
+      </div>
+      <i class='bx bxs-user-plus icon'></i>
+    </div>
+    <span class="progress" data-value="65%"></span>
+    <span class="label"><a href="{% url 'admin_users' %}">Quản lý tài khoản →</a></span>
+  </div>
+
+  <div class="card">
+    <div class="head">
+      <div>
+        <h2>{{ total_revenue|floatformat:0 }}đ</h2>
+        <p>Doanh thu (VNĐ)</p>
+      </div>
+      <i class='bx bx-line-chart icon'></i>
+    </div>
+    <span class="progress" data-value="75%"></span>
+    <span class="label">Tổng doanh thu</span>
+  </div>
+
+</div>
+
+<!-- BẢNG PHIM MỚI NHẤT (giống PHP gốc) -->
+<div class="data">
+  <div class="content-data">
+    <div class="head">
+      <h3>Danh sách phim mới nhất</h3>
+      <div class="menu">
+        <i class='bx bx-dots-horizontal-rounded icon'></i>
+        <ul class="menu-link">
+          <li><a href="{% url 'admin_movies' %}"><i class='bx bx-list-ul'></i> Xem tất cả</a></li>
+          <li><a href="{% url 'admin_create_movie' %}"><i class='bx bx-plus'></i> Thêm phim mới</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="movie-table">
+        <thead>
+          <tr>
+            <th>Mã phim</th>
+            <th>Tên phim</th>
+            <th>Thể loại</th>
+            <th>Thời lượng</th>
+            <th>Ngày khởi chiếu</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in recent_movies %}
+          <tr>
+            <td>#{{ m.MaPhim }}</td>
+            <td><strong>{{ m.TenPhim }}</strong></td>
+            <td>{{ m.MaTL.TenTL|default:"-" }}</td>
+            <td>{{ m.ThoiLuong|default:"120" }} phút</td>
+            <td>{{ m.NgayKhoiChieu|date:"d/m/Y"|default:"-" }}</td>
+            <td>
+              {% if m.NgayKhoiChieu <= today %}
+                <span class="status success">Đang chiếu</span>
+              {% else %}
+                <span class="status pending">Sắp chiếu</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'admin_edit_movie' m.MaPhim %}" class="btn-action btn-edit" title="Chỉnh sửa">
+                <i class='bx bx-edit'></i>
+              </a>
+              <a href="{% url 'admin_delete_movie' m.MaPhim %}" class="btn-action btn-delete" title="Xóa" onclick="return confirm('Xóa phim này?')">
+                <i class='bx bx-trash'></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" style="text-align:center;padding:20px;color:#999;">Chưa có phim nào</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- BẢNG TÀI KHOẢN MỚI (giống PHP gốc) -->
+<div class="data">
+  <div class="content-data">
+    <div class="head">
+      <h3>Danh sách tài khoản mới đăng ký</h3>
+      <div class="menu">
+        <i class='bx bx-dots-horizontal-rounded icon'></i>
+        <ul class="menu-link">
+          <li><a href="{% url 'admin_users' %}"><i class='bx bx-list-ul'></i> Xem tất cả</a></li>
+          <li><a href="{% url 'admin_create_user' %}"><i class='bx bx-plus'></i> Thêm tài khoản</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Vai trò</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in recent_users %}
+          <tr>
+            <td>#{{ u.user_id }}</td>
+            <td><strong>{{ u.user_name }}</strong></td>
+            <td>{{ u.user_email }}</td>
+            <td>
+              {% if u.user_role == "admin" %}
+                <span class="role admin">Quản trị viên</span>
+              {% elif u.user_role == "staff" %}
+                <span class="role staff">Nhân viên</span>
+              {% else %}
+                <span class="role customer">Khách hàng</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'admin_edit_user' u.user_id %}" class="btn-action btn-edit" title="Chỉnh sửa">
+                <i class='bx bx-edit'></i>
+              </a>
+              <a href="{% url 'admin_delete_user' u.user_id %}" class="btn-action btn-delete" title="Xóa" onclick="return confirm('Xóa tài khoản này?')">
+                <i class='bx bx-trash'></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">Chưa có tài khoản nào</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- BẢNG HÓA ĐƠN GẦN ĐÂY -->
+<div class="data">
+  <div class="content-data">
+    <div class="head">
+      <h3>Hóa đơn gần đây</h3>
+      <div class="menu">
+        <i class='bx bx-dots-horizontal-rounded icon'></i>
+        <ul class="menu-link">
+          <li><a href="{% url 'admin_bills' %}"><i class='bx bx-list-ul'></i> Xem tất cả</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="movie-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Khách hàng</th>
+            <th>Phim</th>
+            <th>Ghế</th>
+            <th>Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in recent_bills %}
+          <tr>
+            <td>#{{ b.MaHoaDon }}</td>
+            <td>{{ b.guest_name|default:"-" }}</td>
+            <td>{{ b.MaSuatChieu.MaPhim.TenPhim }}</td>
+            <td>{{ b.Ghe }}</td>
+            <td><strong>{{ b.ThanhTien|floatformat:0 }}đ</strong></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">Chưa có hóa đơn nào</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CSS + JS giống PHP gốc (dashboard.php lines 268-391) -->
+<style>
+.table-responsive { overflow-x:auto; margin-top:1rem; }
+.movie-table, .user-table { width:100%; border-collapse:collapse; }
+.movie-table th, .movie-table td,
+.user-table th,  .user-table td {
+  padding:12px 15px; text-align:left;
+  border-bottom:1px solid rgba(132,139,200,.18);
+}
+.movie-table th, .user-table th {
+  background-color:#F9F9F9; font-weight:600; font-size:13px; color:#555;
+}
+.movie-table tr:hover, .user-table tr:hover { background-color:rgba(132,139,200,.05); }
+
+.status, .role {
+  padding:5px 12px; border-radius:20px;
+  font-size:12px; font-weight:600; display:inline-block;
+}
+.status.success { background:rgba(23,201,100,.15); color:#17C964; }
+.status.pending { background:rgba(255,196,0,.15); color:#e0a800; }
+.role.admin   { background:rgba(71,130,218,.15); color:#4782DA; }
+.role.staff   { background:rgba(140,86,217,.15); color:#8C56D9; }
+.role.customer{ background:rgba(0,196,140,.15); color:#00C48C; }
+
+.btn-action {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:32px; height:32px; border-radius:4px;
+  background:transparent; border:none; cursor:pointer;
+  transition:all .3s ease; margin-right:4px; text-decoration:none; color:inherit;
+}
+.btn-action i { font-size:16px; }
+.btn-edit:hover  { background:rgba(71,130,218,.18); color:#4782DA; }
+.btn-delete:hover{ background:rgba(252,59,86,.18); color:#FC3B56; }
+
+.info-data .card:hover {
+  transform:translateY(-5px);
+  box-shadow:0 10px 20px rgba(0,0,0,.1);
+}
+.card .label a { color:#1775F1; font-weight:700; font-size:14px; text-decoration:none; }
+.card .label a:hover { text-decoration:underline; }
+</style>
+
+<script>
+// Progress bar animation — giống PHP gốc
+document.querySelectorAll('.progress').forEach(item => {
+  item.style.setProperty('--value', item.dataset.value);
+});
+// Menu dropdown
+document.querySelectorAll('.content-data .menu .icon').forEach(icon => {
+  icon.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const ml = this.nextElementSibling;
+    document.querySelectorAll('.menu-link').forEach(m => {
+      if (m !== ml) m.classList.remove('show');
+    });
+    ml.classList.toggle('show');
+  });
+});
+document.addEventListener('click', () => {
+  document.querySelectorAll('.menu-link').forEach(m => m.classList.remove('show'));
+});
+</script>
+{% endblock %}

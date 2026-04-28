@@ -1,0 +1,72 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}Quản lý phim - CinemaAdmin{% endblock %}
+
+{% block content %}
+<h1 class="title">Quản lý phim</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">Phim</a></li>
+</ul>
+
+<div class="data">
+  <div class="content-data">
+    <div class="head" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <h3>Danh sách phim</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <form method="GET" style="display:flex; gap:8px;">
+          <input type="text" name="q" value="{{ search }}" placeholder="Tìm phim..."
+            style="padding:8px 12px; border-radius:6px; border:1px solid #dee2e6; background:#f8f9fa; color:#333; outline:none;">
+          <button type="submit" style="padding:8px 16px; border-radius:6px; background:#1775F1; color:white; border:none; cursor:pointer; font-weight:500;">
+            <i class="bx bx-search"></i> Tìm
+          </button>
+        </form>
+        <a href="{% url 'admin_create_movie' %}" style="padding:8px 16px; border-radius:6px; background:#4CAF50; color:white; text-decoration:none; display:flex; align-items:center; gap:6px;">
+          <i class='bx bx-plus'></i> Thêm phim
+        </a>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Ảnh</th><th>Tên phim</th><th>Thể loại</th><th>Ngày chiếu</th><th>Thao tác</th></tr>
+        </thead>
+        <tbody>
+          {% for m in movies %}
+          <tr>
+            <td>{{ m.MaPhim }}</td>
+            <td>
+              {% if m.Hinh %}
+                <img src="{% static 'admin/img/uploads/' %}{{ m.Hinh }}" style="width:45px; height:65px; object-fit:cover; border-radius:4px; box-shadow:0 2px 5px rgba(0,0,0,.3)">
+              {% else %}
+                <div style="width:45px; height:65px; background:#333; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:.6rem; color:#666">No Info</div>
+              {% endif %}
+            </td>
+            <td><strong>{{ m.TenPhim }}</strong></td>
+            <td>{{ m.MaTL.TenTL }}</td>
+            <td>{{ m.NgayKhoiChieu|date:"d/m/Y" }}</td>
+            <td>
+              <div style="display:flex; gap:6px;">
+                <a href="{% url 'admin_edit_movie' m.MaPhim %}" class="btn-action btn-edit" title="Sửa"><i class='bx bx-edit'></i></a>
+                <a href="{% url 'admin_delete_movie' m.MaPhim %}" class="btn-action btn-delete" title="Xóa" onclick="return confirm('Xóa phim này?')"><i class='bx bx-trash'></i></a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" style="text-align:center; padding:20px; color:#999;">Chưa có phim nào</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if movies.has_other_pages %}
+    <div style="display:flex; gap:8px; margin-top:20px; justify-content:center;">
+      {% if movies.has_previous %}<a href="?page={{ movies.previous_page_number }}&q={{ search }}" class="btn-action">‹</a>{% endif %}
+      {% for p in movies.paginator.page_range %}<a href="?page={{ p }}&q={{ search }}" class="btn-action {% if p == movies.number %}btn-edit{% endif %}">{{ p }}</a>{% endfor %}
+      {% if movies.has_next %}<a href="?page={{ movies.next_page_number }}&q={{ search }}" class="btn-action">›</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

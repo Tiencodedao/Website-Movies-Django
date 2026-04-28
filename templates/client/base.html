@@ -1,0 +1,190 @@
+{% load static %}<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Movies Vietnam{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'client/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'client/css/footer.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <link rel="icon" href="{% static 'client/img/logo_web.jpg' %}" type="image/x-icon">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<header>
+  <a href="{% url 'index' %}" class="logo"><i class="bx bx-movie"></i> Movies</a>
+  <div class="bx bx-menu" id="menu-icon"></div>
+  <ul class="navbar">
+    <li><a href="{% url 'index' %}" {% if request.resolver_match.url_name == "index" %}class="home-active"{% endif %}>Trang chủ</a></li>
+    <li><a href="{% url 'movie_list' %}" {% if request.resolver_match.url_name == "movie_list" %}class="home-active"{% endif %}>Phim</a></li>
+    <li><a href="{% url 'coming' %}" {% if request.resolver_match.url_name == "coming" %}class="home-active"{% endif %}>Sắp chiếu</a></li>
+    <li><a href="{% url 'newsletter' %}" {% if request.resolver_match.url_name == "newsletter" %}class="home-active"{% endif %}>Newsletter</a></li>
+  </ul>
+  <div class="nav-buttons">
+    {% if current_user %}
+      <!-- User dropdown -->
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-trigger" onclick="toggleUserMenu()">
+          <div class="user-avatar">{{ current_user.user_name|first|upper }}</div>
+          <span class="user-name-text">{{ current_user.user_name }}</span>
+          <i class='bx bx-chevron-down'></i>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-avatar-lg">{{ current_user.user_name|first|upper }}</div>
+            <div>
+              <div class="um-name">{{ current_user.user_name }}</div>
+              <div class="um-email">{{ current_user.user_email }}</div>
+              <div class="um-role {% if current_user.IsStaff %}um-role-admin{% else %}um-role-user{% endif %}">
+                {% if current_user.IsStaff %}⚙ Quản trị viên{% else %}👤 Thành viên{% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="user-menu-divider"></div>
+          {% if current_user.IsStaff %}
+          <a href="{% url 'admin_dashboard' %}" class="um-item um-admin"><i class='bx bxs-dashboard'></i> Trang quản trị</a>
+          {% endif %}
+          <a href="{% url 'logout' %}" class="um-item um-logout"><i class='bx bx-log-out'></i> Đăng xuất</a>
+        </div>
+      </div>
+    {% else %}
+      <a href="{% url 'login' %}" class="btn">Đăng nhập</a>
+    {% endif %}
+  </div>
+</header>
+
+<style>
+/* User dropdown in header */
+.user-dropdown { position: relative; }
+.user-trigger {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; padding: 6px 12px;
+  border-radius: 50px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  transition: all .2s;
+}
+.user-trigger:hover { background: rgba(255,255,255,.15); }
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--main-color);
+  color: #fff; font-weight: 700; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.user-name-text {
+  font-size: 13px; font-weight: 600; color: #fff;
+  max-width: 100px; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+.user-trigger .bx-chevron-down { font-size: 16px; color: rgba(255,255,255,.7); transition: transform .2s; }
+.user-dropdown.open .bx-chevron-down { transform: rotate(180deg); }
+
+/* Dropdown panel */
+.user-menu {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  background: #1a1a2e; border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px; min-width: 240px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5);
+  opacity: 0; pointer-events: none; transform: translateY(-8px);
+  transition: all .2s ease; z-index: 9999;
+}
+.user-dropdown.open .user-menu { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+/* Menu header */
+.user-menu-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px;
+}
+.user-avatar-lg {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--main-color);
+  color: #fff; font-weight: 700; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.um-name { font-weight: 700; font-size: 14px; color: #fff; }
+.um-email { font-size: 12px; color: rgba(255,255,255,.5); margin: 2px 0 5px; }
+.um-role {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 50px;
+}
+.um-role-admin { background: rgba(255,44,31,.2); color: var(--main-color); }
+.um-role-user  { background: rgba(99,179,237,.2); color: #63b3ed; }
+
+.user-menu-divider { height: 1px; background: rgba(255,255,255,.08); }
+
+/* Menu items */
+.um-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; font-size: 14px; color: rgba(255,255,255,.8);
+  text-decoration: none; transition: all .15s;
+}
+.um-item i { font-size: 17px; }
+.um-item:hover { background: rgba(255,255,255,.07); color: #fff; }
+.um-admin { color: #63b3ed; }
+.um-admin:hover { background: rgba(99,179,237,.1); }
+.um-logout { color: rgba(255,100,100,.8); border-radius: 0 0 12px 12px; }
+.um-logout:hover { background: rgba(255,44,31,.1); color: var(--main-color); }
+
+@media(max-width:768px){
+  .user-name-text { display: none; }
+  .user-menu { right: 0; left: auto; }
+}
+</style>
+
+<script>
+function toggleUserMenu() {
+  document.getElementById('userDropdown').classList.toggle('open');
+}
+// Click ngoài để đóng
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('userDropdown');
+  if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+});
+</script>
+
+
+{% block content %}{% endblock %}
+
+<section class="newsletter" id="newsletter">
+  <h2>Subscribe To Get <br> Newsletter</h2>
+  <form>
+    <input type="email" class="email" placeholder="Enter Email..." required>
+    <input type="submit" value="Subscribe" class="btn">
+  </form>
+</section>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-section about">
+      <a href="{% url 'index' %}" class="logo"><i class="bx bxs-movie"></i> Movies</a>
+      <p class="footer-about">Nền tảng đặt vé xem phim trực tuyến hàng đầu Việt Nam.</p>
+      <div class="social">
+        <a href="#"><i class='bx bxl-facebook'></i></a>
+        <a href="#"><i class='bx bxl-twitter'></i></a>
+        <a href="#"><i class='bx bxl-instagram'></i></a>
+        <a href="#"><i class='bx bxl-tiktok'></i></a>
+      </div>
+    </div>
+    <div class="footer-section links"><h3>Liên kết nhanh</h3><ul>
+      <li><a href="{% url 'index' %}">Trang chủ</a></li>
+      <li><a href="{% url 'movie_list' %}">Phim</a></li>
+    </ul></div>
+    <div class="footer-section contact"><h3>Liên hệ</h3><ul>
+      <li><i class='bx bxs-map'></i> 123 Nguyễn Văn Linh, Q7, TP.HCM</li>
+      <li><i class='bx bxs-phone'></i> +84 123 456 789</li>
+      <li><i class='bx bxs-envelope'></i> info@moviesvietnam.com</li>
+    </ul></div>
+  </div>
+  <div class="copyright"><p>&#169; 2025 Movies Vietnam.</p></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="{% static 'client/js/main.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,208 @@
+{% extends 'client/base.html' %}{% load static %}
+{% block title %}{{ movie.TenPhim }} - Movies Vietnam{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'client/css/detail.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}
+{% block content %}
+<main class="movie-container">
+  <section class="movie-header">
+    <div class="movie-image">
+      <img src="{% static 'admin/img/uploads/' %}{{ movie.Hinh }}" alt="{{ movie.TenPhim }}">
+    </div>
+    <div class="movie-details">
+      <h1>{{ movie.TenPhim }}</h1>
+      <div class="movie-meta">
+        <div class="meta-item"><i class="bx bx-calendar"></i><span>{{ movie.NgayKhoiChieu|date:"d/m/Y"|default:"Đang cập nhật" }}</span></div>
+        <div class="meta-item"><i class="bx bx-time"></i><span>{{ movie.ThoiLuong|default:"120" }} phút</span></div>
+        <div class="meta-item"><i class="bx bx-film"></i><span>{{ movie.MaTL.TenTL|default:"Đang cập nhật" }}</span></div>
+      </div>
+      <div class="action-buttons">
+        <a href="#showtimes" class="btn-buy-ticket">Mua vé ngay</a>
+        {% if movie.Trailer %}
+        <a href="javascript:void(0)" onclick="scrollToElement('#trailer')" class="btn-trailer">
+          <i class="bx bx-play-circle"></i> Xem trailer
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="movie-description">
+    <h2>Nội dung phim</h2>
+    <p>{% if movie.MoTa %}{{ movie.MoTa|linebreaksbr }}{% else %}Đang cập nhật nội dung phim...{% endif %}</p>
+  </section>
+
+  <section class="showtimes" id="showtimes">
+    <h2>Lịch chiếu</h2>
+
+    <!-- Bước 1: Chọn ngày -->
+    <div class="booking-step">
+      <div class="step-title"><span class="step-number">1</span><h3>Chọn ngày xem phim</h3></div>
+      <div class="date-selector">
+        {% for day in week_days %}
+          {% if day.is_available %}
+            <a href="javascript:void(0)" onclick="selectDate('{{ day.date|date:"Y-m-d" }}')" data-date="{{ day.date|date:"Y-m-d" }}" class="date-item {% if day.is_selected %}active{% endif %}">
+              {{ day.label }}<br><small>{{ day.date|date:"d/m" }}</small>
+            </a>
+          {% else %}
+            <div class="date-item disabled">{{ day.label }}<br><small>{{ day.date|date:"d/m" }}</small></div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Bước 2: Chọn phòng -->
+    <div class="booking-step">
+      <div class="step-title"><span class="step-number">2</span><h3>Chọn phòng chiếu</h3></div>
+      <div class="room-selector" id="room-container">
+        {% for room in all_rooms %}
+          {% if room.MaPhong in rooms_with_shows %}
+            <a href="javascript:void(0)" onclick="selectRoom('{{ room.MaPhong }}')" data-room="{{ room.MaPhong }}"
+               class="room-item {% if room.MaPhong|stringformat:'i' == selected_room_id %}active{% endif %}">
+              {{ room.TenPhong }}
+            </a>
+          {% else %}
+            <div class="room-item disabled">{{ room.TenPhong }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Bước 3: Chọn giờ -->
+    <div class="booking-step">
+      <div class="step-title"><span class="step-number">3</span><h3>Chọn giờ chiếu</h3></div>
+      <div class="time-container">
+        <div class="time-slots" id="time-container">
+          {% if showtimes %}
+            {% for t in showtimes %}
+              <a href="javascript:void(0)" onclick="selectTime('{{ t|time:"H:i" }}')"
+                 class="time-slot {% if t|time:'H:i' == selected_time %}active{% endif %}">
+                {{ t|time:"H:i" }}
+              </a>
+            {% endfor %}
+          {% else %}
+            <p style="color:rgba(255,255,255,.5)">Không có lịch chiếu cho phòng này</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Thông tin đặt vé -->
+    <div class="booking-step" id="booking-info-container">
+      <div class="booking-info">
+        {% if selected_date and selected_room_id and selected_time %}
+          {% include 'client/partials/booking_info_partial.html' %}
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Trailer -->
+  {% if movie.Trailer %}
+  <section class="trailer-container" id="trailer" style="padding: 40px 0;">
+    <h2 class="heading">Trailer Phim</h2>
+    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.5);">
+      <iframe src="{{ movie.Trailer }}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Phim liên quan -->
+  {% if related_movies %}
+  <section class="related-movies" style="padding:40px 0;">
+    <h2 class="heading">Phim cùng thể loại</h2>
+    <div class="movies-container">
+      {% for rm in related_movies %}
+      <div class="box">
+        <div class="box-img">
+          <a href="{% url 'movie_detail' rm.MaPhim %}">
+            <img src="{% static 'admin/img/uploads/' %}{{ rm.Hinh }}" alt="{{ rm.TenPhim }}">
+          </a>
+        </div>
+        <h3>{{ rm.TenPhim }}</h3>
+        <span>{{ rm.ThoiLuong|default:"120" }} min | {{ rm.MaTL.TenTL }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+.booking-step{margin-bottom:30px;background:rgba(255,255,255,.05);border-radius:10px;padding:20px;}
+.step-title{display:flex;align-items:center;margin-bottom:15px;}
+.step-number{background:var(--main-color);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:10px;font-weight:bold;flex-shrink:0;}
+.step-title h3{margin:0;font-size:1.2rem;}
+.date-selector{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+.date-item{background:rgba(255,255,255,.1);padding:10px 15px;border-radius:5px;cursor:pointer;transition:all .3s;text-align:center;text-decoration:none;color:inherit;display:block;}
+.date-item.active{background:var(--main-color);color:#fff;}
+.date-item.disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
+.room-selector{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+.room-item{background:rgba(255,255,255,.1);padding:10px 20px;border-radius:5px;cursor:pointer;transition:all .3s;text-decoration:none;color:inherit;display:block;}
+.room-item.active{background:var(--main-color);color:#fff;}
+.room-item.disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
+.time-container{margin-top:10px;}
+.time-slots{display:flex;flex-wrap:wrap;gap:10px;}
+.time-slot{background:rgba(255,255,255,.1);padding:10px 15px;border-radius:5px;cursor:pointer;transition:all .3s;text-decoration:none;color:inherit;display:block;}
+.time-slot:hover,.time-slot.active{background:var(--main-color);color:#fff;}
+.booking-info{background:rgba(255,255,255,.05);border-radius:8px;padding:5px;}
+</style>
+<script>
+var movieId='{{ movie.MaPhim }}', currentDate='{{ selected_date }}', currentRoom='{{ selected_room_id }}', currentTime='{{ selected_time }}';
+
+function selectDate(d) {
+  currentDate = d; currentTime = '';
+  $.ajax({
+    url: '/movies/' + movieId + '/?date=' + d + '&part=rooms',
+    headers: {'X-Requested-With': 'XMLHttpRequest'},
+    success: function(r) {
+      $('.date-selector .date-item').removeClass('active');
+      $('[data-date="' + d + '"]').addClass('active');
+      $('#room-container').html(r);
+      $('#time-container').html('<p style="color:rgba(255,255,255,.5)">Vui lòng chọn phòng chiếu</p>');
+      $('#booking-info-container .booking-info').html('');
+      var f = $('#room-container a.room-item:first');
+      if (f.length) selectRoom(f.data('room'));
+    },
+    error: function() {
+      $('#room-container').html('<p style="color:rgba(255,255,255,.5)">Không có lịch chiếu cho ngày này</p>');
+    }
+  });
+}
+
+function selectRoom(r) {
+  currentRoom = r; currentTime = '';
+  $.ajax({
+    url: '/movies/' + movieId + '/?date=' + currentDate + '&room=' + r + '&part=times',
+    headers: {'X-Requested-With': 'XMLHttpRequest'},
+    success: function(html) {
+      $('#room-container .room-item').removeClass('active');
+      $('[data-room="' + r + '"]').addClass('active');
+      $('#time-container').html(html);
+      $('#booking-info-container .booking-info').html('');
+    }
+  });
+}
+
+function selectTime(t) {
+  currentTime = t;
+  $.ajax({
+    url: '/movies/' + movieId + '/?date=' + currentDate + '&room=' + currentRoom + '&time=' + t + '&part=booking-info',
+    headers: {'X-Requested-With': 'XMLHttpRequest'},
+    success: function(html) {
+      $('.time-slot').removeClass('active');
+      $('.time-slot').each(function() { if($(this).text().trim() === t) $(this).addClass('active'); });
+      $('#booking-info-container .booking-info').html(html);
+    }
+  });
+}
+
+function scrollToElement(selector) {
+  var el = document.querySelector(selector);
+  if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+</script>
+{% endblock %}

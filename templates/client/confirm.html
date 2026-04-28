@@ -1,0 +1,156 @@
+{% extends 'client/base.html' %}{% load static %}
+{% block title %}Đặt vé thành công - Movies Vietnam{% endblock %}
+{% block content %}
+<main style="max-width:900px;margin:80px auto 50px;padding:0 20px;">
+
+  <!-- Header kết quả -->
+  <div style="background:rgba(0,0,0,.4);border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,.4);overflow:hidden;">
+    <div style="text-align:center;padding:40px 20px;background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(16,185,129,.05));">
+      <div style="width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2.5rem;background:rgba(16,185,129,.15);border:2px solid #10b981;color:#10b981;">
+        <i class="bx bx-check-circle"></i>
+      </div>
+      <h1 style="color:#10b981;margin-bottom:10px;font-size:2rem;">Đặt vé thành công!</h1>
+      <p style="color:rgba(255,255,255,.65);font-size:1.05rem;">Cảm ơn bạn đã đặt vé tại Movies Vietnam. Vui lòng kiểm tra email để xem chi tiết.</p>
+    </div>
+
+    <!-- Vé điện tử -->
+    <div style="background:rgba(255,255,255,.03);border-radius:12px;margin:0 20px 20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);">
+
+      <!-- Top ticket: thông tin phim + mã đơn -->
+      <div style="background:#0d0d0d;padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;border-bottom:2px dashed rgba(255,255,255,.1);">
+        <div style="display:flex;gap:20px;align-items:center;">
+          <img src="{% static 'admin/img/uploads/' %}{{ movie.Hinh }}" alt="{{ movie.TenPhim }}"
+               style="width:80px;border-radius:8px;box-shadow:0 5px 15px rgba(0,0,0,.5);">
+          <div>
+            <h2 style="font-size:1.4rem;margin-bottom:8px;font-weight:700;">{{ movie.TenPhim }}</h2>
+            <div style="display:flex;gap:12px;color:rgba(255,255,255,.6);font-size:.9rem;flex-wrap:wrap;">
+              <span><i class="bx bx-time"></i> {{ movie.ThoiLuong|default:"120" }} phút</span>
+              <span><i class="bx bx-film"></i> {{ movie.MaTL.TenTL }}</span>
+            </div>
+          </div>
+        </div>
+        <div style="background:rgba(0,0,0,.4);padding:12px 18px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,.1);">
+          <span style="display:block;font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:4px;">Mã đơn hàng</span>
+          <strong style="font-size:1.3rem;">#{{ bill.MaHoaDon }}</strong>
+        </div>
+      </div>
+
+      <!-- Chi tiết vé -->
+      <div style="padding:25px;display:flex;flex-wrap:wrap;gap:30px;">
+        <!-- Thông tin suất chiếu -->
+        <div style="flex:1;min-width:280px;">
+          <div style="display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
+            <div style="flex:1;min-width:200px;display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.25);padding:15px;border-radius:10px;">
+              <i class="bx bx-calendar" style="font-size:24px;color:var(--main-color);flex-shrink:0;"></i>
+              <div>
+                <span style="display:block;font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:3px;">Ngày chiếu</span>
+                <span style="font-size:1rem;font-weight:600;">{{ showtime.NgayChieu|date:"d/m/Y" }}</span>
+              </div>
+            </div>
+            <div style="flex:1;min-width:200px;display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.25);padding:15px;border-radius:10px;">
+              <i class="bx bx-time" style="font-size:24px;color:var(--main-color);flex-shrink:0;"></i>
+              <div>
+                <span style="display:block;font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:3px;">Giờ chiếu</span>
+                <span style="font-size:1rem;font-weight:600;">{{ showtime.GioBatDau|time:"H:i" }}</span>
+              </div>
+            </div>
+            <div style="flex:1;min-width:200px;display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.25);padding:15px;border-radius:10px;">
+              <i class="bx bx-building" style="font-size:24px;color:var(--main-color);flex-shrink:0;"></i>
+              <div>
+                <span style="display:block;font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:3px;">Phòng chiếu</span>
+                <span style="font-size:1rem;font-weight:600;">{{ room.TenPhong }}</span>
+              </div>
+            </div>
+            <div style="flex:1;min-width:200px;display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.25);padding:15px;border-radius:10px;">
+              <i class="bx bxs-chair" style="font-size:24px;color:var(--main-color);flex-shrink:0;"></i>
+              <div>
+                <span style="display:block;font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:3px;">Ghế</span>
+                <span style="font-size:1rem;font-weight:600;color:var(--main-color);">{{ bill.Ghe }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thông tin khách hàng -->
+          <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:16px;margin-bottom:16px;">
+            <h3 style="font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+              <i class="bx bx-user" style="color:var(--main-color);"></i> Thông tin khách hàng
+            </h3>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);">
+              <span style="color:rgba(255,255,255,.6);">Họ tên:</span>
+              <strong>{{ bill.guest_name }}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);">
+              <span style="color:rgba(255,255,255,.6);">Email:</span>
+              <strong>{{ bill.guest_email }}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+              <span style="color:rgba(255,255,255,.6);">Số điện thoại:</span>
+              <strong>{{ bill.guest_phone }}</strong>
+            </div>
+          </div>
+
+          <!-- Thông tin thanh toán -->
+          <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:16px;">
+            <h3 style="font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+              <i class="bx bx-credit-card" style="color:var(--main-color);"></i> Thông tin thanh toán
+            </h3>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);">
+              <span style="color:rgba(255,255,255,.6);">Số lượng vé:</span>
+              <strong>{{ bill.SoLuong }} vé</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);">
+              <span style="color:rgba(255,255,255,.6);">Giá vé:</span>
+              <strong>{{ gia_ve|floatformat:0 }}đ/vé</strong>
+            </div>
+            {% if payment_method %}
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);">
+              <span style="color:rgba(255,255,255,.6);">Phương thức:</span>
+              <strong>{{ payment_method }}</strong>
+            </div>
+            {% endif %}
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:2px solid rgba(255,44,31,.4);margin-top:4px;font-size:1.2rem;">
+              <span style="font-weight:700;">Tổng cộng:</span>
+              <strong style="color:var(--main-color);">{{ bill.ThanhTien|floatformat:0 }}đ</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR Code -->
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="background:#fff;padding:18px;border-radius:12px;text-align:center;box-shadow:0 5px 20px rgba(0,0,0,.4);">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ qr_data|urlencode }}"
+                 alt="QR Code vé" style="width:180px;height:180px;display:block;margin-bottom:8px;">
+            <p style="color:#333;font-size:.85rem;font-weight:600;margin:0;">Quét mã QR để kiểm tra vé</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex;justify-content:center;gap:15px;padding:20px 25px 30px;flex-wrap:wrap;">
+        <button onclick="window.print()"
+          style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s;text-decoration:none;">
+          <i class="bx bx-printer"></i> In vé
+        </button>
+        <a href="{% url 'index' %}"
+          style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--main-color);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s;text-decoration:none;">
+          <i class="bx bx-home"></i> Về trang chủ
+        </a>
+        <a href="{% url 'movie_list' %}"
+          style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s;text-decoration:none;">
+          <i class="bx bx-film"></i> Xem thêm phim
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+@media print {
+  header, .newsletter, footer, .copyright, [onclick*="print"] { display: none !important; }
+  body, html { background: #fff !important; color: #000 !important; }
+  main { margin: 0 !important; }
+}
+</style>
+{% endblock %}

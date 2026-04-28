@@ -1,0 +1,44 @@
+{% extends 'client/base.html' %}
+{% load static %}
+{% block title %}Newsletter - Đang phát triển - Movies Vietnam{% endblock %}
+
+{% block content %}
+<div style="min-height:70vh;display:flex;align-items:center;justify-content:center;padding:80px 20px;text-align:center;">
+  <div>
+    <!-- Icon -->
+    <div style="font-size:5rem;margin-bottom:24px;line-height:1;">📧</div>
+
+    <!-- Badge -->
+    <div style="display:inline-flex;align-items:center;gap:8px;
+         background:rgba(99,179,237,.1);border:1px solid rgba(99,179,237,.25);
+         color:#63b3ed;padding:6px 18px;border-radius:50px;
+         font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+         margin-bottom:24px;">
+      🚧 Đang phát triển
+    </div>
+
+    <h1 style="font-size:2.6rem;font-weight:800;margin-bottom:16px;">Newsletter</h1>
+    <p style="font-size:16px;color:rgba(255,255,255,.55);max-width:420px;margin:0 auto 36px;line-height:1.7;">
+      Tính năng <strong style="color:#fff;">Newsletter</strong> đang được xây dựng.<br>
+      Sắp tới bạn có thể đăng ký nhận bản tin phim hay mỗi tuần!
+    </p>
+
+    <!-- Progress bar -->
+    <div style="background:rgba(255,255,255,.08);border-radius:50px;height:6px;max-width:300px;margin:0 auto 36px;overflow:hidden;">
+      <div style="width:40%;height:100%;background:linear-gradient(90deg,#63b3ed,#90cdf4);border-radius:50px;
+           animation:progress-anim 2.2s ease-in-out infinite alternate;"></div>
+    </div>
+
+    <a href="{% url 'index' %}" class="btn" style="padding:12px 32px;display:inline-flex;align-items:center;gap:8px;">
+      <i class='bx bx-home'></i> Về trang chủ
+    </a>
+  </div>
+</div>
+
+<style>
+@keyframes progress-anim {
+  from { width: 30%; }
+  to   { width: 55%; }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Thêm thể loại - CinemaAdmin{% endblock %}
+{% block content %}
+<h1 class="title">Thêm thể loại</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="{% url 'admin_genres' %}">Thể loại</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">Thêm mới</a></li>
+</ul>
+
+<form method="POST">
+{% csrf_token %}
+<div class="form-card" style="margin-top:24px; max-width:520px;">
+  <div class="form-card-header">
+    <i class='bx bxs-category'></i>
+    <div>
+      <h3>Thêm thể loại phim</h3>
+      <p>Tạo thể loại mới để phân loại phim</p>
+    </div>
+  </div>
+  <div class="form-card-body">
+    <div class="form-grid col-1">
+
+      <div class="form-group">
+        <label class="form-label">{{ form.TenTL.label }} <span class="req">*</span></label>
+        {{ form.TenTL }}
+        <span class="form-hint">VD: Hành động, Tình cảm, Kinh dị, Hoạt hình</span>
+        {% if form.TenTL.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.TenTL.errors.0 }}</div>{% endif %}
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <button type="submit" class="btn-save"><i class='bx bx-save'></i> Lưu thể loại</button>
+      <a href="{% url 'admin_genres' %}" class="btn-cancel"><i class='bx bx-x'></i> Hủy</a>
+    </div>
+  </div>
+</div>
+</form>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'admin_panel/base.html' %}{% load static %}
+{% block title %}Thêm phim mới - CinemaAdmin{% endblock %}
+{% block content %}
+<h1 class="title">Thêm phim mới</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="{% url 'admin_movies' %}">Phim</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">Thêm mới</a></li>
+</ul>
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+<div class="form-card" style="margin-top:24px;">
+  <div class="form-card-header">
+    <i class='bx bxs-film'></i>
+    <div>
+      <h3>Thông tin phim</h3>
+      <p>Điền đầy đủ thông tin để thêm phim mới vào hệ thống</p>
+    </div>
+  </div>
+  <div class="form-card-body">
+    <div class="form-grid">
+
+      <!-- Tên phim -->
+      <div class="form-group form-span-2">
+        <label class="form-label">{{ form.TenPhim.label }} <span class="req">*</span></label>
+        {{ form.TenPhim }}
+        {% if form.TenPhim.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.TenPhim.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Thể loại -->
+      <div class="form-group">
+        <label class="form-label">{{ form.MaTL.label }} <span class="req">*</span></label>
+        {{ form.MaTL }}
+        {% if form.MaTL.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.MaTL.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Ngày khởi chiếu -->
+      <div class="form-group">
+        <label class="form-label">{{ form.NgayKhoiChieu.label }} <span class="req">*</span></label>
+        {{ form.NgayKhoiChieu }}
+        {% if form.NgayKhoiChieu.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.NgayKhoiChieu.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Thời lượng -->
+      <div class="form-group">
+        <label class="form-label">{{ form.ThoiLuong.label }}</label>
+        {{ form.ThoiLuong }}
+        {% if form.ThoiLuong.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.ThoiLuong.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Link Trailer -->
+      <div class="form-group">
+        <label class="form-label">{{ form.Trailer.label }}</label>
+        {{ form.Trailer }}
+        <span class="form-hint">VD: https://www.youtube.com/embed/abc123</span>
+        {% if form.Trailer.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.Trailer.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Mô tả -->
+      <div class="form-group form-span-2">
+        <label class="form-label">{{ form.MoTa.label }}</label>
+        {{ form.MoTa }}
+        {% if form.MoTa.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.MoTa.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Tên file ảnh -->
+      <div class="form-group">
+        <label class="form-label">{{ form.Hinh.label }}</label>
+        {{ form.Hinh }}
+        <span class="form-hint">Nhập tên file ảnh (VD: phim.jpg)</span>
+        {% if form.Hinh.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.Hinh.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Upload ảnh -->
+      <div class="form-group">
+        <label class="form-label">Upload ảnh phim <span style="font-weight:400;color:#9ca3af;">(Hoặc chọn file)</span></label>
+        <input type="file" name="hinh_file" accept="image/*" class="form-input" style="padding:7px;">
+        <span class="form-hint">Để trống nếu dùng tên file bên trái</span>
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <button type="submit" class="btn-save"><i class='bx bx-save'></i> Lưu phim</button>
+      <a href="{% url 'admin_movies' %}" class="btn-cancel"><i class='bx bx-x'></i> Hủy</a>
+    </div>
+  </div>
+</div>
+</form>
+{% endblock %}

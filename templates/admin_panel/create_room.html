@@ -1,0 +1,42 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Thêm phòng chiếu - CinemaAdmin{% endblock %}
+{% block content %}
+<h1 class="title">Thêm phòng chiếu</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="{% url 'admin_rooms' %}">Phòng chiếu</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">Thêm mới</a></li>
+</ul>
+
+<form method="POST">
+{% csrf_token %}
+<div class="form-card" style="margin-top:24px; max-width:520px;">
+  <div class="form-card-header">
+    <i class='bx bxs-buildings'></i>
+    <div>
+      <h3>Thông tin phòng chiếu</h3>
+      <p>Thêm phòng chiếu mới vào hệ thống</p>
+    </div>
+  </div>
+  <div class="form-card-body">
+    <div class="form-grid col-1">
+
+      <div class="form-group">
+        <label class="form-label">{{ form.TenPhong.label }} <span class="req">*</span></label>
+        {{ form.TenPhong }}
+        <span class="form-hint">VD: Phòng 1, Phòng VIP A, Phòng IMAX</span>
+        {% if form.TenPhong.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.TenPhong.errors.0 }}</div>{% endif %}
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <button type="submit" class="btn-save"><i class='bx bx-save'></i> Lưu phòng</button>
+      <a href="{% url 'admin_rooms' %}" class="btn-cancel"><i class='bx bx-x'></i> Hủy</a>
+    </div>
+  </div>
+</div>
+</form>
+{% endblock %}

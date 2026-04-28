@@ -1,0 +1,12 @@
+{% if selected_date and selected_room_id and selected_time %}
+<div style="background:rgba(255,255,255,.05);border-radius:12px;padding:20px;margin-top:20px;border:1px solid rgba(255,255,255,.1);">
+  <h3 style="margin-bottom:16px;color:var(--main-color,#e50914)">Thông tin đặt vé</h3>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;gap:16px;"><span style="min-width:120px;color:rgba(255,255,255,.6)">Phim:</span><strong>{{ movie.TenPhim }}</strong></div>
+    <div style="display:flex;gap:16px;"><span style="min-width:120px;color:rgba(255,255,255,.6)">Ngày chiếu:</span><strong>{{ selected_date }}</strong></div>
+    <div style="display:flex;gap:16px;"><span style="min-width:120px;color:rgba(255,255,255,.6)">Phòng chiếu:</span><strong>{{ selected_room_name }}</strong></div>
+    <div style="display:flex;gap:16px;"><span style="min-width:120px;color:rgba(255,255,255,.6)">Giờ chiếu:</span><strong>{{ selected_time }}</strong></div>
+  </div>
+  <a href="{% url 'chair' %}?id={{ movie.MaPhim }}&room={{ selected_room_id }}&date={{ selected_date }}&time={{ selected_time }}" class="btn" style="margin-top:20px;display:inline-block;padding:12px 28px;">Tiếp tục chọn ghế →</a>
+</div>
+{% endif %}

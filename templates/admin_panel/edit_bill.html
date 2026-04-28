@@ -1,0 +1,70 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Sửa hóa đơn #{{ bill.MaHoaDon }} - CinemaAdmin{% endblock %}
+{% block content %}
+<h1 class="title">Sửa hóa đơn</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="{% url 'admin_bills' %}">Hóa đơn</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">#{{ bill.MaHoaDon }}</a></li>
+</ul>
+
+<!-- Thông tin tóm tắt hóa đơn -->
+<div style="margin-top:24px; margin-bottom:16px; padding:16px 20px; background:#fff; border-radius:10px;
+     box-shadow:0 2px 8px rgba(0,0,0,.06); display:flex; gap:24px; flex-wrap:wrap; align-items:center;
+     border-left:4px solid #1775F1;">
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span style="font-size:12px;color:#9ca3af;text-transform:uppercase;font-weight:600;">Mã hóa đơn</span>
+    <span style="font-size:18px;font-weight:700;color:#1a1a2e;">#{{ bill.MaHoaDon }}</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span style="font-size:12px;color:#9ca3af;text-transform:uppercase;font-weight:600;">Khách hàng</span>
+    <span style="font-size:15px;font-weight:600;color:#374151;">{{ bill.guest_name|default:"—" }}</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span style="font-size:12px;color:#9ca3af;text-transform:uppercase;font-weight:600;">Phim</span>
+    <span style="font-size:15px;font-weight:600;color:#374151;">{{ bill.MaSuatChieu.MaPhim.TenPhim }}</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span style="font-size:12px;color:#9ca3af;text-transform:uppercase;font-weight:600;">Ghế</span>
+    <span style="font-size:15px;font-weight:700;color:#1775F1;">{{ bill.Ghe }}</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:4px;margin-left:auto;">
+    <span style="font-size:12px;color:#9ca3af;text-transform:uppercase;font-weight:600;">Thành tiền</span>
+    <span style="font-size:20px;font-weight:800;color:#16a34a;">{{ bill.ThanhTien|floatformat:0 }}đ</span>
+  </div>
+</div>
+
+<form method="POST">
+{% csrf_token %}
+<div class="form-card" style="max-width:660px;">
+  <div class="form-card-header">
+    <i class='bx bx-edit-alt'></i>
+    <div>
+      <h3>Chỉnh sửa hóa đơn #{{ bill.MaHoaDon }}</h3>
+      <p>Cập nhật thông tin hóa đơn</p>
+    </div>
+  </div>
+  <div class="form-card-body">
+    <div class="form-grid">
+
+      {% for f in form %}
+      <div class="form-group {% if forloop.first or forloop.last %}form-span-2{% endif %}">
+        <label class="form-label">{{ f.label }}{% if f.field.required %}<span class="req">*</span>{% endif %}</label>
+        {{ f }}
+        {% if f.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ f.errors.0 }}</div>{% endif %}
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <div class="form-footer">
+      <button type="submit" class="btn-save"><i class='bx bx-save'></i> Cập nhật</button>
+      <a href="{% url 'admin_bills' %}" class="btn-cancel"><i class='bx bx-x'></i> Hủy</a>
+      <a href="{% url 'admin_delete_bill' bill.MaHoaDon %}" class="btn-danger"><i class='bx bx-trash'></i> Xóa hóa đơn</a>
+    </div>
+  </div>
+</div>
+</form>
+{% endblock %}

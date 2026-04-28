@@ -1,0 +1,42 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Sửa phòng chiếu - {{ room.TenPhong }} - CinemaAdmin{% endblock %}
+{% block content %}
+<h1 class="title">Sửa phòng chiếu</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="{% url 'admin_rooms' %}">Phòng chiếu</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">{{ room.TenPhong }}</a></li>
+</ul>
+
+<form method="POST">
+{% csrf_token %}
+<div class="form-card" style="margin-top:24px; max-width:520px;">
+  <div class="form-card-header">
+    <i class='bx bx-edit-alt'></i>
+    <div>
+      <h3>Chỉnh sửa phòng chiếu</h3>
+      <p>Đang sửa: <strong>{{ room.TenPhong }}</strong></p>
+    </div>
+  </div>
+  <div class="form-card-body">
+    <div class="form-grid col-1">
+
+      <div class="form-group">
+        <label class="form-label">{{ form.TenPhong.label }} <span class="req">*</span></label>
+        {{ form.TenPhong }}
+        {% if form.TenPhong.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.TenPhong.errors.0 }}</div>{% endif %}
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <button type="submit" class="btn-save"><i class='bx bx-save'></i> Cập nhật</button>
+      <a href="{% url 'admin_rooms' %}" class="btn-cancel"><i class='bx bx-x'></i> Hủy</a>
+      <a href="{% url 'admin_delete_room' room.MaPhong %}" class="btn-danger"><i class='bx bx-trash'></i> Xóa phòng</a>
+    </div>
+  </div>
+</div>
+</form>
+{% endblock %}

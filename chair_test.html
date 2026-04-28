@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chọn ghế - Thor - Movies Vietnam</title>
+  <link rel="stylesheet" href="/static/client/css/style.css">
+  <link rel="stylesheet" href="/static/client/css/footer.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <link rel="icon" href="/static/client/img/logo_web.jpg" type="image/x-icon">
+  
+<style>
+/* ===== SEAT SELECTION PAGE ===== */
+.chair-page { padding: 90px 5% 60px; max-width: 1100px; margin: 0 auto; }
+
+/* Info bar top */
+.booking-info-bar {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: 20px 24px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 28px;
+  backdrop-filter: blur(6px);
+}
+.booking-poster {
+  width: 80px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  flex-shrink: 0;
+}
+.booking-meta { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.booking-meta h2 { font-size: 1.3rem; font-weight: 700; margin: 0 0 8px; }
+.booking-meta-row { display: flex; gap: 24px; flex-wrap: wrap; }
+.meta-item { display: flex; align-items: center; gap: 6px; font-size: 14px; color: rgba(255,255,255,.75); }
+.meta-item i { color: var(--main-color); font-size: 16px; }
+.meta-item strong { color: #fff; }
+.price-badge {
+  background: rgba(255,44,31,.15);
+  border: 1px solid rgba(255,44,31,.3);
+  color: var(--main-color);
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+/* Layout 2 cột */
+.chair-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+@media(max-width: 768px) { .chair-layout { grid-template-columns: 1fr; } }
+
+/* Seat map panel */
+.seat-panel {
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 24px;
+  backdrop-filter: blur(6px);
+}
+.panel-title {
+  font-size: 1.1rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 20px;
+  padding-bottom: 12px; border-bottom: 2px solid var(--main-color);
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-title i { color: var(--main-color); }
+
+/* Screen */
+.screen-wrap { text-align: center; margin-bottom: 24px; }
+.screen-bar {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.06));
+  border: 1px solid rgba(255,255,255,.2); border-bottom: none;
+  padding: 8px 80px; border-radius: 8px 8px 0 0;
+  font-size: 12px; letter-spacing: 4px; color: rgba(255,255,255,.6);
+  font-weight: 600;
+}
+.screen-shadow {
+  height: 8px;
+  background: linear-gradient(rgba(255,255,255,.15), transparent);
+  border-radius: 0 0 60% 60%;
+  max-width: 320px; margin: 0 auto;
+}
+
+/* Legend */
+.seat-legend {
+  display: flex; justify-content: center; gap: 24px;
+  margin-bottom: 22px; padding: 10px 16px;
+  background: rgba(255,255,255,.04); border-radius: 8px; flex-wrap: wrap;
+}
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: rgba(255,255,255,.7); }
+.legend-box { width: 20px; height: 20px; border-radius: 4px; display: inline-block; }
+.legend-empty  { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.3); }
+.legend-select { background: var(--main-color); }
+.legend-vip    { background: #f59e0b; }
+.legend-booked { background: #555; }
+
+/* Seat grid */
+.seat-grid { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.seat-row { display: flex; align-items: center; gap: 6px; }
+.row-label {
+  width: 24px; text-align: center; font-size: 13px;
+  font-weight: 700; color: rgba(255,255,255,.4);
+}
+
+/* SEAT */
+.seat {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 6px 6px 4px 4px;
+  cursor: pointer; font-size: 11px; font-weight: 600;
+  transition: all .18s ease;
+  user-select: none; position: relative;
+}
+.seat::after {
+  content: '';
+  position: absolute; bottom: -3px; left: 10%; right: 10%;
+  height: 3px; background: rgba(255,255,255,.15);
+  border-radius: 0 0 3px 3px;
+}
+.seat:not(.booked):not(.vip):hover {
+  background: rgba(255,44,31,.45);
+  border-color: var(--main-color);
+  transform: translateY(-2px) scale(1.08);
+}
+.seat.selected {
+  background: var(--main-color) !important;
+  border-color: #ff6b5b !important;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255,44,31,.55);
+}
+.seat.selected::after { background: rgba(255,255,255,.3); }
+.seat.vip {
+  background: rgba(245,158,11,.15);
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+.seat.vip:not(.booked):hover {
+  background: rgba(245,158,11,.45);
+  transform: translateY(-2px) scale(1.08);
+}
+.seat.vip.selected {
+  background: #f59e0b !important;
+  border-color: #fbbf24 !important;
+  color: #fff;
+}
+.seat.booked {
+  background: rgba(80,80,80,.6) !important;
+  border-color: #444 !important;
+  cursor: not-allowed !important;
+  opacity: .65;
+  transform: none !important;
+}
+@media(max-width: 500px) { .seat { width: 28px; height: 28px; font-size: 10px; } }
+
+/* Aisle gap */
+.seat-aisle { width: 16px; }
+
+/* Payment sidebar */
+.payment-panel {
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: 22px;
+  backdrop-filter: blur(6px);
+  position: sticky;
+  top: 84px;
+}
+.summary-rows { display: flex; flex-direction: column; gap: 0; }
+.summary-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.07);
+  font-size: 14px;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-label { color: rgba(255,255,255,.65); font-weight: 500; }
+.summary-value { font-weight: 700; text-align: right; max-width: 60%; word-break: break-word; }
+.summary-total {
+  padding: 14px 0 0; margin-top: 4px;
+  border-top: 2px solid rgba(255,255,255,.12);
+}
+.summary-total .summary-label { font-size: 15px; font-weight: 700; color: #fff; }
+.summary-total .summary-value { font-size: 20px; color: var(--main-color); }
+
+.seat-chips {
+  display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end;
+}
+.seat-chip {
+  background: var(--main-color); color: #fff;
+  padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;
+}
+
+.btn-book {
+  display: block; width: 100%; margin-top: 18px;
+  padding: 14px; background: var(--main-color);
+  color: #fff; border: none; border-radius: 10px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 1px;
+  transition: all .2s;
+}
+.btn-book:hover:not(:disabled) {
+  background: #ff4433;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255,44,31,.5);
+}
+.btn-book:disabled {
+  opacity: .4; cursor: not-allowed; transform: none !important;
+}
+.btn-back {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-top: 10px; padding: 11px;
+  background: rgba(255,255,255,.07); color: rgba(255,255,255,.7);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+  font-size: 13px; text-decoration: none; transition: all .2s;
+}
+.btn-back:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+/* Tip text */
+.tip-text {
+  text-align: center; margin-top: 14px;
+  font-size: 12px; color: rgba(255,255,255,.35);
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo"><i class="bx bx-movie"></i> Movies</a>
+  <div class="bx bx-menu" id="menu-icon"></div>
+  <ul class="navbar">
+    <li><a href="/" >Trang chủ</a></li>
+    <li><a href="/movies/" >Phim</a></li>
+  </ul>
+  <div class="nav-buttons">
+    
+      <a href="/login/" class="btn">Đăng nhập</a>
+    
+  </div>
+</header>
+
+
+<div class="chair-page">
+
+  <!-- Info bar -->
+  <div class="booking-info-bar">
+    
+    <img src="/static/admin/img/uploads/Thor_poster.jpg" alt="Thor" class="booking-poster">
+    
+    <div class="booking-meta">
+      <h2>Thor</h2>
+      <div class="booking-meta-row">
+        <div class="meta-item"><i class='bx bx-calendar'></i><span>Ngày: <strong>2026-04-28</strong></span></div>
+        <div class="meta-item"><i class='bx bx-time'></i><span>Giờ: <strong>19:00</strong></span></div>
+        <div class="meta-item"><i class='bx bx-building'></i><span>Phòng: <strong>Phòng 3</strong></span></div>
+      </div>
+    </div>
+    
+    <div class="price-badge">750000đ / ghế</div>
+    
+  </div>
+
+  <!-- 2-column layout -->
+  <form method="POST" action="/payment/" id="seat-form">
+    <input type="hidden" name="csrfmiddlewaretoken" value="AnKhSqxXCx5pO9LsuCQP3TIqYNn8bVQWUNEhQlR3l0CCOQvrMx2WFGUKOIUu14dl">
+    <input type="hidden" name="movie_id" value="28">
+    <input type="hidden" name="room_id" value="3">
+    <input type="hidden" name="date" value="2026-04-28">
+    <input type="hidden" name="time" value="19:00">
+    <input type="hidden" name="seats" id="seats-input">
+    <input type="hidden" name="seat_count" id="seat-count-input" value="0">
+
+    <div class="chair-layout">
+
+      <!-- LEFT: Seat map -->
+      <div class="seat-panel">
+        <div class="panel-title"><i class='bx bxs-movie-play'></i> Chọn ghế ngồi</div>
+
+        <!-- Screen -->
+        <div class="screen-wrap">
+          <div class="screen-bar">MÀN HÌNH</div>
+          <div class="screen-shadow"></div>
+        </div>
+
+        <!-- Legend -->
+        <div class="seat-legend">
+          <div class="legend-item"><span class="legend-box legend-empty"></span> Ghế trống</div>
+          <div class="legend-item"><span class="legend-box legend-select"></span> Đang chọn</div>
+          <div class="legend-item"><span class="legend-box legend-vip"></span> Ghế VIP</div>
+          <div class="legend-item"><span class="legend-box legend-booked"></span> Đã đặt</div>
+        </div>
+
+        <!-- Seat grid -->
+        <div class="seat-grid" id="seat-map">
+          
+          <div class="seat-row">
+            <span class="row-label">A</span>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="A1"
+                   data-price="0"
+                   title="Ghế A1">
+                1
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="A2"
+                   data-price="0"
+                   title="Ghế A2">
+                2
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="A3"
+                   data-price="0"
+                   title="Ghế A3">
+                3
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="A4"
+                   data-price="0"
+                   title="Ghế A4">
+                4
+              </div>
+            
+              
+              <div class="seat-aisle"></div>
+              <div class="seat  "
+                   data-seat="A5"
+                   data-price="0"
+                   title="Ghế A5">
+                5
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="A6"
+                   data-price="0"
+                   title="Ghế A6">
+                6
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="A7"
+                   data-price="0"
+                   title="Ghế A7">
+                7
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="A8"
+                   data-price="0"
+                   title="Ghế A8">
+                8
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="A9"
+                   data-price="0"
+                   title="Ghế A9">
+                9
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="A10"
+                   data-price="0"
+                   title="Ghế A10">
+                10
+              </div>
+            
+          </div>
+          
+          <div class="seat-row">
+            <span class="row-label">B</span>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="B1"
+                   data-price="0"
+                   title="Ghế B1">
+                1
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="B2"
+                   data-price="0"
+                   title="Ghế B2">
+                2
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="B3"
+                   data-price="0"
+                   title="Ghế B3">
+                3
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="B4"
+                   data-price="0"
+                   title="Ghế B4">
+                4
+              </div>
+            
+              
+              <div class="seat-aisle"></div>
+              <div class="seat  "
+                   data-seat="B5"
+                   data-price="0"
+                   title="Ghế B5">
+                5
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="B6"
+                   data-price="0"
+                   title="Ghế B6">
+                6
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="B7"
+                   data-price="0"
+                   title="Ghế B7">
+                7
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="B8"
+                   data-price="0"
+                   title="Ghế B8">
+                8
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="B9"
+                   data-price="0"
+                   title="Ghế B9">
+                9
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="B10"
+                   data-price="0"
+                   title="Ghế B10">
+                10
+              </div>
+            
+          </div>
+          
+          <div class="seat-row">
+            <span class="row-label">C</span>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="C1"
+                   data-price="0"
+                   title="Ghế C1">
+                1
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="C2"
+                   data-price="0"
+                   title="Ghế C2">
+                2
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="C3"
+                   data-price="0"
+                   title="Ghế C3">
+                3
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="C4"
+                   data-price="0"
+                   title="Ghế C4">
+                4
+              </div>
+            
+              
+              <div class="seat-aisle"></div>
+              <div class="seat  "
+                   data-seat="C5"
+                   data-price="0"
+                   title="Ghế C5">
+                5
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="C6"
+                   data-price="0"
+                   title="Ghế C6">
+                6
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="C7"
+                   data-price="0"
+                   title="Ghế C7">
+                7
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="C8"
+                   data-price="0"
+                   title="Ghế C8">
+                8
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="C9"
+                   data-price="0"
+                   title="Ghế C9">
+                9
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="C10"
+                   data-price="0"
+                   title="Ghế C10">
+                10
+              </div>
+            
+          </div>
+          
+          <div class="seat-row">
+            <span class="row-label">D</span>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="D1"
+                   data-price="0"
+                   title="Ghế D1">
+                1
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="D2"
+                   data-price="0"
+                   title="Ghế D2">
+                2
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="D3"
+                   data-price="0"
+                   title="Ghế D3">
+                3
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="D4"
+                   data-price="0"
+                   title="Ghế D4">
+                4
+              </div>
+            
+              
+              <div class="seat-aisle"></div>
+              <div class="seat  "
+                   data-seat="D5"
+                   data-price="0"
+                   title="Ghế D5">
+                5
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="D6"
+                   data-price="0"
+                   title="Ghế D6">
+                6
+              </div>
+            
+              
+              
+              <div class="seat booked "
+                   data-seat="D7"
+                   data-price="0"
+                   title="Ghế D7 - Đã đặt">
+                7
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="D8"
+                   data-price="0"
+                   title="Ghế D8">
+                8
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="D9"
+                   data-price="0"
+                   title="Ghế D9">
+                9
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="D10"
+                   data-price="0"
+                   title="Ghế D10">
+                10
+              </div>
+            
+          </div>
+          
+          <div class="seat-row">
+            <span class="row-label">E</span>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="E1"
+                   data-price="0"
+                   title="Ghế E1">
+                1
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="E2"
+                   data-price="0"
+                   title="Ghế E2">
+                2
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="E3"
+                   data-price="0"
+                   title="Ghế E3">
+                3
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="E4"
+                   data-price="0"
+                   title="Ghế E4">
+                4
+              </div>
+            
+              
+              <div class="seat-aisle"></div>
+              <div class="seat  "
+                   data-seat="E5"
+                   data-price="0"
+                   title="Ghế E5">
+                5
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="E6"
+                   data-price="0"
+                   title="Ghế E6">
+                6
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="E7"
+                   data-price="0"
+                   title="Ghế E7">
+                7
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="E8"
+                   data-price="0"
+                   title="Ghế E8">
+                8
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="E9"
+                   data-price="0"
+                   title="Ghế E9">
+                9
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="E10"
+                   data-price="0"
+                   title="Ghế E10">
+                10
+              </div>
+            
+          </div>
+          
+          <div class="seat-row">
+            <span class="row-label">F</span>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="F1"
+                   data-price="0"
+                   title="Ghế F1">
+                1
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="F2"
+                   data-price="0"
+                   title="Ghế F2">
+                2
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="F3"
+                   data-price="0"
+                   title="Ghế F3">
+                3
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="F4"
+                   data-price="0"
+                   title="Ghế F4">
+                4
+              </div>
+            
+              
+              <div class="seat-aisle"></div>
+              <div class="seat  "
+                   data-seat="F5"
+                   data-price="0"
+                   title="Ghế F5">
+                5
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="F6"
+                   data-price="0"
+                   title="Ghế F6">
+                6
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="F7"
+                   data-price="0"
+                   title="Ghế F7">
+                7
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="F8"
+                   data-price="0"
+                   title="Ghế F8">
+                8
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="F9"
+                   data-price="0"
+                   title="Ghế F9">
+                9
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="F10"
+                   data-price="0"
+                   title="Ghế F10">
+                10
+              </div>
+            
+          </div>
+          
+          <div class="seat-row">
+            <span class="row-label">G</span>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="G1"
+                   data-price="0"
+                   title="Ghế G1">
+                1
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="G2"
+                   data-price="0"
+                   title="Ghế G2">
+                2
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="G3"
+                   data-price="0"
+                   title="Ghế G3">
+                3
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="G4"
+                   data-price="0"
+                   title="Ghế G4">
+                4
+              </div>
+            
+              
+              <div class="seat-aisle"></div>
+              <div class="seat  "
+                   data-seat="G5"
+                   data-price="0"
+                   title="Ghế G5">
+                5
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="G6"
+                   data-price="0"
+                   title="Ghế G6">
+                6
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="G7"
+                   data-price="0"
+                   title="Ghế G7">
+                7
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="G8"
+                   data-price="0"
+                   title="Ghế G8">
+                8
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="G9"
+                   data-price="0"
+                   title="Ghế G9">
+                9
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="G10"
+                   data-price="0"
+                   title="Ghế G10">
+                10
+              </div>
+            
+          </div>
+          
+          <div class="seat-row">
+            <span class="row-label">H</span>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="H1"
+                   data-price="0"
+                   title="Ghế H1">
+                1
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="H2"
+                   data-price="0"
+                   title="Ghế H2">
+                2
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="H3"
+                   data-price="0"
+                   title="Ghế H3">
+                3
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="H4"
+                   data-price="0"
+                   title="Ghế H4">
+                4
+              </div>
+            
+              
+              <div class="seat-aisle"></div>
+              <div class="seat  "
+                   data-seat="H5"
+                   data-price="0"
+                   title="Ghế H5">
+                5
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="H6"
+                   data-price="0"
+                   title="Ghế H6">
+                6
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="H7"
+                   data-price="0"
+                   title="Ghế H7">
+                7
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="H8"
+                   data-price="0"
+                   title="Ghế H8">
+                8
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="H9"
+                   data-price="0"
+                   title="Ghế H9">
+                9
+              </div>
+            
+              
+              
+              <div class="seat  "
+                   data-seat="H10"
+                   data-price="0"
+                   title="Ghế H10">
+                10
+              </div>
+            
+          </div>
+          
+        </div>
+
+        <div class="tip-text">Nhấn vào ghế để chọn · Nhấn lại để bỏ chọn</div>
+      </div>
+
+      <!-- RIGHT: Payment summary -->
+      <div class="payment-panel">
+        <div class="panel-title"><i class='bx bxs-receipt'></i> Chi tiết đặt vé</div>
+
+        <div class="summary-rows">
+          <div class="summary-row">
+            <span class="summary-label">Phim</span>
+            <span class="summary-value" style="color:#fff;">Thor</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Ngày chiếu</span>
+            <span class="summary-value">2026-04-28</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Suất chiếu</span>
+            <span class="summary-value">19:00</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Phòng</span>
+            <span class="summary-value">Phòng 3</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Ghế đã chọn</span>
+            <div class="summary-value">
+              <div id="seat-chips-wrap" class="seat-chips">
+                <span style="color:rgba(255,255,255,.35);font-size:13px;font-weight:400;">Chưa chọn</span>
+              </div>
+            </div>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Số vé</span>
+            <span class="summary-value" id="seat-count-text">0 vé</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Đơn giá</span>
+            <span class="summary-value">750000đ/ghế</span>
+          </div>
+          <div class="summary-row summary-total">
+            <span class="summary-label">Tổng cộng</span>
+            <span class="summary-value" id="total-text">0đ</span>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn-book" disabled>
+          <i class='bx bx-credit-card'></i> Tiếp tục thanh toán
+        </button>
+        <a href="javascript:history.back()" class="btn-back">
+          <i class='bx bx-arrow-back'></i> Quay lại chọn suất
+        </a>
+      </div>
+
+    </div>
+  </form>
+
+</div>
+
+
+<section class="newsletter" id="newsletter">
+  <h2>Subscribe To Get <br> Newsletter</h2>
+  <form>
+    <input type="email" class="email" placeholder="Enter Email..." required>
+    <input type="submit" value="Subscribe" class="btn">
+  </form>
+</section>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-section about">
+      <a href="/" class="logo"><i class="bx bxs-movie"></i> Movies</a>
+      <p class="footer-about">Nền tảng đặt vé xem phim trực tuyến hàng đầu Việt Nam.</p>
+      <div class="social">
+        <a href="#"><i class='bx bxl-facebook'></i></a>
+        <a href="#"><i class='bx bxl-twitter'></i></a>
+        <a href="#"><i class='bx bxl-instagram'></i></a>
+        <a href="#"><i class='bx bxl-tiktok'></i></a>
+      </div>
+    </div>
+    <div class="footer-section links"><h3>Liên kết nhanh</h3><ul>
+      <li><a href="/">Trang chủ</a></li>
+      <li><a href="/movies/">Phim</a></li>
+    </ul></div>
+    <div class="footer-section contact"><h3>Liên hệ</h3><ul>
+      <li><i class='bx bxs-map'></i> 123 Nguyễn Văn Linh, Q7, TP.HCM</li>
+      <li><i class='bx bxs-phone'></i> +84 123 456 789</li>
+      <li><i class='bx bxs-envelope'></i> info@moviesvietnam.com</li>
+    </ul></div>
+  </div>
+  <div class="copyright"><p>&#169; 2025 Movies Vietnam.</p></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="/static/client/js/main.js"></script>
+
+<script>
+var UNIT_PRICE = parseInt("750000,00") || 0;
+var selectedSeats = [];
+
+// Gắn event ĐÚNG qua addEventListener (không dùng onclick inline)
+document.addEventListener('DOMContentLoaded', function () {
+  var seats = document.querySelectorAll('.seat:not(.booked)');
+  seats.forEach(function (el) {
+    el.addEventListener('click', function () {
+      toggleSeat(el);
+    });
+  });
+});
+
+function toggleSeat(el) {
+  var sid = el.getAttribute('data-seat');
+  if (!sid) return;
+
+  if (el.classList.contains('selected')) {
+    el.classList.remove('selected');
+    selectedSeats = selectedSeats.filter(function (x) { return x !== sid; });
+  } else {
+    el.classList.add('selected');
+    selectedSeats.push(sid);
+  }
+  updateSummary();
+}
+
+function updateSummary() {
+  var count = selectedSeats.length;
+  var total = count * UNIT_PRICE;
+
+  // Ghế đã chọn — hiện chips
+  var wrap = document.getElementById('seat-chips-wrap');
+  if (count === 0) {
+    wrap.innerHTML = '<span style="color:rgba(255,255,255,.35);font-size:13px;font-weight:400;">Chưa chọn</span>';
+  } else {
+    wrap.innerHTML = selectedSeats.map(function (s) {
+      return '<span class="seat-chip">' + s + '</span>';
+    }).join('');
+  }
+
+  // Số vé
+  document.getElementById('seat-count-text').textContent = count + ' vé';
+
+  // Tổng tiền
+  document.getElementById('total-text').textContent =
+    count > 0 ? total.toLocaleString('vi-VN') + 'đ' : '0đ';
+
+  // Hidden inputs
+  document.getElementById('seats-input').value = selectedSeats.join(',');
+  document.getElementById('seat-count-input').value = count;
+
+  // Button
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = (count === 0);
+}
+</script>
+
+</body>
+</html>

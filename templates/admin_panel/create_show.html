@@ -1,0 +1,66 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Thêm suất chiếu - CinemaAdmin{% endblock %}
+{% block content %}
+<h1 class="title">Thêm suất chiếu mới</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="{% url 'admin_shows' %}">Suất chiếu</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">Thêm mới</a></li>
+</ul>
+
+<form method="POST">
+{% csrf_token %}
+<div class="form-card" style="margin-top:24px;">
+  <div class="form-card-header">
+    <i class='bx bxs-calendar-event'></i>
+    <div>
+      <h3>Thông tin suất chiếu</h3>
+      <p>Thiết lập lịch chiếu phim cho phòng và thời gian cụ thể</p>
+    </div>
+  </div>
+  <div class="form-card-body">
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label class="form-label">{{ form.MaPhim.label }} <span class="req">*</span></label>
+        {{ form.MaPhim }}
+        {% if form.MaPhim.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.MaPhim.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ form.MaPhong.label }} <span class="req">*</span></label>
+        {{ form.MaPhong }}
+        {% if form.MaPhong.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.MaPhong.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ form.NgayChieu.label }} <span class="req">*</span></label>
+        {{ form.NgayChieu }}
+        {% if form.NgayChieu.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.NgayChieu.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ form.GioBatDau.label }} <span class="req">*</span></label>
+        {{ form.GioBatDau }}
+        {% if form.GioBatDau.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.GioBatDau.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group form-span-2">
+        <label class="form-label">{{ form.GiaVe.label }} <span class="req">*</span></label>
+        {{ form.GiaVe }}
+        <span class="form-hint">Đơn vị: VNĐ (VD: 85000)</span>
+        {% if form.GiaVe.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.GiaVe.errors.0 }}</div>{% endif %}
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <button type="submit" class="btn-save"><i class='bx bx-save'></i> Lưu suất chiếu</button>
+      <a href="{% url 'admin_shows' %}" class="btn-cancel"><i class='bx bx-x'></i> Hủy</a>
+    </div>
+  </div>
+</div>
+</form>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% if showtimes %}
+  {% for t in showtimes %}
+    <a href="javascript:void(0)" onclick="selectTime('{{ t|time:"H:i" }}')" class="time-slot {% if t|time:'H:i' == selected_time %}active{% endif %}">{{ t|time:"H:i" }}</a>
+  {% endfor %}
+{% else %}
+  <p style="color:rgba(255,255,255,.5)">Không có lịch chiếu cho phòng này</p>
+{% endif %}

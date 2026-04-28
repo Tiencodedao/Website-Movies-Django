@@ -1,0 +1,61 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Quản lý hóa đơn - CinemaAdmin{% endblock %}
+
+{% block content %}
+<h1 class="title">Quản lý hóa đơn</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">Hóa đơn</a></li>
+</ul>
+
+<div class="data">
+  <div class="content-data">
+    <div class="head" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <h3>Danh sách hóa đơn</h3>
+      <form method="GET" style="display:flex; gap:8px;">
+        <input type="text" name="q" value="{{ search }}" placeholder="Tìm tên/email/phim..."
+          style="padding:8px 12px; border-radius:6px; border:1px solid #dee2e6; background:#f8f9fa; color:#333; outline:none;">
+        <button type="submit" style="padding:8px 16px; border-radius:6px; background:#1775F1; color:white; border:none; cursor:pointer; font-weight:500;"><i class="bx bx-search"></i> Tìm</button>
+      </form>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Khách hàng</th><th>Phim</th><th>Ghế</th><th>Tổng tiền</th><th>Thao tác</th></tr>
+        </thead>
+        <tbody>
+          {% for b in bills %}
+          <tr>
+            <td>#{{ b.MaHoaDon }}</td>
+            <td>
+              <strong>{{ b.guest_name }}</strong><br>
+              <small style="color:#888">{{ b.guest_email }}</small>
+            </td>
+            <td><small>{{ b.MaSuatChieu.MaPhim.TenPhim }}</small></td>
+            <td><code style="background:#f0f4f8;padding:3px 8px;border-radius:4px;font-size:.85rem;color:#333;border:1px solid #e2e8f0;">{{ b.Ghe }}</code></td>
+            <td><strong style="color:#0d6efd">{{ b.ThanhTien|floatformat:0 }}đ</strong></td>
+            <td>
+              <div style="display:flex; gap:6px;">
+                <a href="{% url 'admin_edit_bill' b.MaHoaDon %}" class="btn-action btn-edit" title="Sửa"><i class='bx bx-edit'></i></a>
+                <a href="{% url 'admin_delete_bill' b.MaHoaDon %}" class="btn-action btn-delete" title="Xóa" onclick="return confirm('Xóa hóa đơn này?')"><i class='bx bx-trash'></i></a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" style="text-align:center; padding:20px; color:#999;">Chưa có hóa đơn nào</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if bills.has_other_pages %}
+    <div style="display:flex; gap:8px; margin-top:20px; justify-content:center;">
+      {% if bills.has_previous %}<a href="?page={{ bills.previous_page_number }}&q={{ search }}" class="btn-action">‹</a>{% endif %}
+      {% for p in bills.paginator.page_range %}<a href="?page={{ p }}&q={{ search }}" class="btn-action {% if p == bills.number %}btn-edit{% endif %}">{{ p }}</a>{% endfor %}
+      {% if bills.has_next %}<a href="?page={{ bills.next_page_number }}&q={{ search }}" class="btn-action">›</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

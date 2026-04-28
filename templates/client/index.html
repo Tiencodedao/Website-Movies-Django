@@ -1,0 +1,38 @@
+{% extends 'client/base.html' %}{% load static %}
+{% block title %}Trang chủ - Movies Vietnam{% endblock %}
+{% block content %}
+<section class="home swiper" id="home">
+  <div class="swiper-wrapper">
+    <div class="swiper-slide container">
+      <img src="{% static 'client/img/home3.jpg' %}" alt=""><div class="home-text"><span>Marvel Universe</span><h1>Spider-Man: <br>Far from Home</h1><a href="{% url 'movie_list' %}" class="btn">Book Now</a><a href="https://youtu.be/JfVOs4VSpmA" class="play"><i class="bx bx-play"></i></a></div>
+    </div>
+    <div class="swiper-slide container">
+      <img src="{% static 'client/img/home2.jpg' %}" alt=""><div class="home-text"><span>Marvel Universe</span><h1>Avengers: <br> Infinity War</h1><a href="{% url 'movie_list' %}" class="btn">Book Now</a><a href="#" class="play"><i class="bx bx-play"></i></a></div>
+    </div>
+  </div>
+  <div class="swiper-pagination"></div>
+</section>
+<section class="movies" id="movies">
+  <h2 class="heading">Phim Đang Chiếu</h2>
+  <div class="movies-container">
+    {% for movie in now_playing %}
+    <div class="box">
+      <div class="box-img"><a href="{% url 'movie_detail' movie.MaPhim %}"><img src="{% static 'admin/img/uploads/' %}{{ movie.Hinh }}" alt="{{ movie.TenPhim }}"></a></div>
+      <h3>{{ movie.TenPhim }}</h3><span>120 min | {{ movie.MaTL.TenTL }}</span>
+    </div>
+    {% empty %}<p style="color:rgba(255,255,255,.6);padding:20px">Chưa có phim đang chiếu.</p>
+    {% endfor %}
+  </div>
+</section>
+<section class="coming" id="coming">
+  <h2 class="heading">Phim Sắp Chiếu</h2>
+  <div class="coming-container swiper"><div class="swiper-wrapper">
+    {% for movie in coming_soon %}
+    <div class="swiper-slide box">
+      <div class="box-img"><a href="{% url 'movie_detail' movie.MaPhim %}"><img src="{% static 'admin/img/uploads/' %}{{ movie.Hinh }}" alt="{{ movie.TenPhim }}"></a></div>
+      <h3>{{ movie.TenPhim }}</h3><span>120 min | {{ movie.MaTL.TenTL }}</span>
+    </div>
+    {% endfor %}
+  </div></div>
+</section>
+{% endblock %}

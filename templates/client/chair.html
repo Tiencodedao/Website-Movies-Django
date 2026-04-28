@@ -1,0 +1,420 @@
+{% extends 'client/base.html' %}
+{% load static %}
+{% block title %}Chọn ghế - {{ movie.TenPhim }} - Movies Vietnam{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ===== SEAT SELECTION PAGE ===== */
+.chair-page { padding: 90px 5% 60px; max-width: 1100px; margin: 0 auto; }
+
+/* Info bar top */
+.booking-info-bar {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: 20px 24px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 28px;
+  backdrop-filter: blur(6px);
+}
+.booking-poster {
+  width: 80px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  flex-shrink: 0;
+}
+.booking-meta { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.booking-meta h2 { font-size: 1.3rem; font-weight: 700; margin: 0 0 8px; }
+.booking-meta-row { display: flex; gap: 24px; flex-wrap: wrap; }
+.meta-item { display: flex; align-items: center; gap: 6px; font-size: 14px; color: rgba(255,255,255,.75); }
+.meta-item i { color: var(--main-color); font-size: 16px; }
+.meta-item strong { color: #fff; }
+.price-badge {
+  background: rgba(255,44,31,.15);
+  border: 1px solid rgba(255,44,31,.3);
+  color: var(--main-color);
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+/* Layout 2 cột */
+.chair-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+@media(max-width: 768px) { .chair-layout { grid-template-columns: 1fr; } }
+
+/* Seat map panel */
+.seat-panel {
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 24px;
+  backdrop-filter: blur(6px);
+}
+.panel-title {
+  font-size: 1.1rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 20px;
+  padding-bottom: 12px; border-bottom: 2px solid var(--main-color);
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-title i { color: var(--main-color); }
+
+/* Screen */
+.screen-wrap { text-align: center; margin-bottom: 24px; }
+.screen-bar {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.06));
+  border: 1px solid rgba(255,255,255,.2); border-bottom: none;
+  padding: 8px 80px; border-radius: 8px 8px 0 0;
+  font-size: 12px; letter-spacing: 4px; color: rgba(255,255,255,.6);
+  font-weight: 600;
+}
+.screen-shadow {
+  height: 8px;
+  background: linear-gradient(rgba(255,255,255,.15), transparent);
+  border-radius: 0 0 60% 60%;
+  max-width: 320px; margin: 0 auto;
+}
+
+/* Legend */
+.seat-legend {
+  display: flex; justify-content: center; gap: 24px;
+  margin-bottom: 22px; padding: 10px 16px;
+  background: rgba(255,255,255,.04); border-radius: 8px; flex-wrap: wrap;
+}
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: rgba(255,255,255,.7); }
+.legend-box { width: 20px; height: 20px; border-radius: 4px; display: inline-block; }
+.legend-empty  { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.3); }
+.legend-select { background: var(--main-color); }
+.legend-vip    { background: #f59e0b; }
+.legend-booked { background: #555; }
+
+/* Seat grid */
+.seat-grid { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.seat-row { display: flex; align-items: center; gap: 6px; }
+.row-label {
+  width: 24px; text-align: center; font-size: 13px;
+  font-weight: 700; color: rgba(255,255,255,.4);
+}
+
+/* SEAT */
+.seat {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 6px 6px 4px 4px;
+  cursor: pointer; font-size: 11px; font-weight: 600;
+  transition: all .18s ease;
+  user-select: none; position: relative;
+}
+.seat::after {
+  content: '';
+  position: absolute; bottom: -3px; left: 10%; right: 10%;
+  height: 3px; background: rgba(255,255,255,.15);
+  border-radius: 0 0 3px 3px;
+}
+.seat:not(.booked):not(.vip):hover {
+  background: rgba(255,44,31,.45);
+  border-color: var(--main-color);
+  transform: translateY(-2px) scale(1.08);
+}
+.seat.selected {
+  background: var(--main-color) !important;
+  border-color: #ff6b5b !important;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255,44,31,.55);
+}
+.seat.selected::after { background: rgba(255,255,255,.3); }
+.seat.vip {
+  background: rgba(245,158,11,.15);
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+.seat.vip:not(.booked):hover {
+  background: rgba(245,158,11,.45);
+  transform: translateY(-2px) scale(1.08);
+}
+.seat.vip.selected {
+  background: #f59e0b !important;
+  border-color: #fbbf24 !important;
+  color: #fff;
+}
+.seat.booked {
+  background: rgba(80,80,80,.6) !important;
+  border-color: #444 !important;
+  cursor: not-allowed !important;
+  opacity: .65;
+  transform: none !important;
+}
+@media(max-width: 500px) { .seat { width: 28px; height: 28px; font-size: 10px; } }
+
+/* Aisle gap */
+.seat-aisle { width: 16px; }
+
+/* Payment sidebar */
+.payment-panel {
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: 22px;
+  backdrop-filter: blur(6px);
+  position: sticky;
+  top: 84px;
+}
+.summary-rows { display: flex; flex-direction: column; gap: 0; }
+.summary-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.07);
+  font-size: 14px;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-label { color: rgba(255,255,255,.65); font-weight: 500; }
+.summary-value { font-weight: 700; text-align: right; max-width: 60%; word-break: break-word; }
+.summary-total {
+  padding: 14px 0 0; margin-top: 4px;
+  border-top: 2px solid rgba(255,255,255,.12);
+}
+.summary-total .summary-label { font-size: 15px; font-weight: 700; color: #fff; }
+.summary-total .summary-value { font-size: 20px; color: var(--main-color); }
+
+.seat-chips {
+  display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end;
+}
+.seat-chip {
+  background: var(--main-color); color: #fff;
+  padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;
+}
+
+.btn-book {
+  display: block; width: 100%; margin-top: 18px;
+  padding: 14px; background: var(--main-color);
+  color: #fff; border: none; border-radius: 10px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 1px;
+  transition: all .2s;
+}
+.btn-book:hover:not(:disabled) {
+  background: #ff4433;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255,44,31,.5);
+}
+.btn-book:disabled {
+  opacity: .4; cursor: not-allowed; transform: none !important;
+}
+.btn-back {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-top: 10px; padding: 11px;
+  background: rgba(255,255,255,.07); color: rgba(255,255,255,.7);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+  font-size: 13px; text-decoration: none; transition: all .2s;
+}
+.btn-back:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+/* Tip text */
+.tip-text {
+  text-align: center; margin-top: 14px;
+  font-size: 12px; color: rgba(255,255,255,.35);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chair-page">
+
+  <!-- Info bar -->
+  <div class="booking-info-bar">
+    {% if movie.Hinh %}
+    <img src="{% static 'admin/img/uploads/' %}{{ movie.Hinh }}" alt="{{ movie.TenPhim }}" class="booking-poster">
+    {% endif %}
+    <div class="booking-meta">
+      <h2>{{ movie.TenPhim }}</h2>
+      <div class="booking-meta-row">
+        <div class="meta-item"><i class='bx bx-calendar'></i><span>Ngày: <strong>{{ date }}</strong></span></div>
+        <div class="meta-item"><i class='bx bx-time'></i><span>Giờ: <strong>{{ time }}</strong></span></div>
+        <div class="meta-item"><i class='bx bx-building'></i><span>Phòng: <strong>{{ room.TenPhong }}</strong></span></div>
+      </div>
+    </div>
+    {% if showtime %}
+    <div class="price-badge">{{ showtime.GiaVe|floatformat:0 }}đ / ghế</div>
+    {% endif %}
+  </div>
+
+  <!-- 2-column layout -->
+  <form method="POST" action="{% url 'payment' %}" id="seat-form">
+    {% csrf_token %}
+    <input type="hidden" name="movie_id" value="{{ movie.MaPhim }}">
+    <input type="hidden" name="room_id" value="{{ room.MaPhong }}">
+    <input type="hidden" name="date" value="{{ date }}">
+    <input type="hidden" name="time" value="{{ time }}">
+    <input type="hidden" name="seats" id="seats-input">
+    <input type="hidden" name="seat_count" id="seat-count-input" value="0">
+
+    <div class="chair-layout">
+
+      <!-- LEFT: Seat map -->
+      <div class="seat-panel">
+        <div class="panel-title"><i class='bx bxs-movie-play'></i> Chọn ghế ngồi</div>
+
+        <!-- Screen -->
+        <div class="screen-wrap">
+          <div class="screen-bar">MÀN HÌNH</div>
+          <div class="screen-shadow"></div>
+        </div>
+
+        <!-- Legend -->
+        <div class="seat-legend">
+          <div class="legend-item"><span class="legend-box legend-empty"></span> Ghế trống</div>
+          <div class="legend-item"><span class="legend-box legend-select"></span> Đang chọn</div>
+          <div class="legend-item"><span class="legend-box legend-vip"></span> Ghế VIP</div>
+          <div class="legend-item"><span class="legend-box legend-booked"></span> Đã đặt</div>
+        </div>
+
+        <!-- Seat grid -->
+        <div class="seat-grid" id="seat-map">
+          {% for row_data in seat_map %}
+          <div class="seat-row">
+            <span class="row-label">{{ row_data.row }}</span>
+            {% for seat in row_data.seats %}
+              {# Aisle gap after seat 5 #}
+              {% if seat.label == 5 %}<div class="seat-aisle"></div>{% endif %}
+              <div class="seat {% if seat.booked %}booked{% endif %} {% if seat.vip %}vip{% endif %}"
+                   data-seat="{{ seat.id }}"
+                   onclick="toggleSeat(this)"
+                   data-price="{% if seat.vip %}{{ seat.vip_price }}{% else %}0{% endif %}"
+                   title="Ghế {{ seat.id }}{% if seat.booked %} - Đã đặt{% endif %}">
+                {{ seat.label }}
+              </div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="tip-text">Nhấn vào ghế để chọn · Nhấn lại để bỏ chọn</div>
+      </div>
+
+      <!-- RIGHT: Payment summary -->
+      <div class="payment-panel">
+        <div class="panel-title"><i class='bx bxs-receipt'></i> Chi tiết đặt vé</div>
+
+        <div class="summary-rows">
+          <div class="summary-row">
+            <span class="summary-label">Phim</span>
+            <span class="summary-value" style="color:#fff;">{{ movie.TenPhim }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Ngày chiếu</span>
+            <span class="summary-value">{{ date }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Suất chiếu</span>
+            <span class="summary-value">{{ time }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Phòng</span>
+            <span class="summary-value">{{ room.TenPhong }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Ghế đã chọn</span>
+            <div class="summary-value">
+              <div id="seat-chips-wrap" class="seat-chips">
+                <span style="color:rgba(255,255,255,.35);font-size:13px;font-weight:400;">Chưa chọn</span>
+              </div>
+            </div>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Số vé</span>
+            <span class="summary-value" id="seat-count-text">0 vé</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Đơn giá</span>
+            <span class="summary-value">{{ showtime.GiaVe|floatformat:0 }}đ/ghế</span>
+          </div>
+          <div class="summary-row summary-total">
+            <span class="summary-label">Tổng cộng</span>
+            <span class="summary-value" id="total-text">0đ</span>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn-book" disabled>
+          <i class='bx bx-credit-card'></i> Tiếp tục thanh toán
+        </button>
+        <a href="javascript:history.back()" class="btn-back">
+          <i class='bx bx-arrow-back'></i> Quay lại chọn suất
+        </a>
+      </div>
+
+    </div>
+  </form>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Lấy giá vé và lọc bỏ tất cả các ký tự không phải số (đề phòng format , hoặc . hoặc chữ)
+var rawPriceStr = "{{ showtime.GiaVe|floatformat:0|default:'0' }}";
+var UNIT_PRICE = parseInt(rawPriceStr.replace(/\D/g, '')) || 0;
+var selectedSeats = [];
+
+function toggleSeat(el) {
+  // Không cho chọn nếu đã đặt
+  if (el.classList.contains('booked')) return;
+  
+  var sid = el.getAttribute('data-seat');
+  if (!sid) return;
+
+  if (el.classList.contains('selected')) {
+    el.classList.remove('selected');
+    selectedSeats = selectedSeats.filter(function (x) { return x !== sid; });
+  } else {
+    el.classList.add('selected');
+    selectedSeats.push(sid);
+  }
+  updateSummary();
+}
+
+function updateSummary() {
+  var count = selectedSeats.length;
+  var total = count * UNIT_PRICE;
+
+  // Ghế đã chọn
+  var wrap = document.getElementById('seat-chips-wrap');
+  if (count === 0) {
+    wrap.innerHTML = '<span style="color:rgba(255,255,255,.35);font-size:13px;font-weight:400;">Chưa chọn</span>';
+  } else {
+    wrap.innerHTML = selectedSeats.map(function (s) {
+      return '<span class="seat-chip">' + s + '</span>';
+    }).join('');
+  }
+
+  // Số vé
+  document.getElementById('seat-count-text').textContent = count + ' vé';
+
+  // Tổng tiền
+  document.getElementById('total-text').textContent =
+    count > 0 ? total.toLocaleString('vi-VN') + 'đ' : '0đ';
+
+  // Hidden inputs form
+  document.getElementById('seats-input').value = selectedSeats.join(',');
+  document.getElementById('seat-count-input').value = count;
+
+  // Trạng thái nút thanh toán
+  var btn = document.getElementById('submit-btn');
+  if (count === 0) {
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+      btn.style.cursor = 'not-allowed';
+  } else {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+  }
+}
+</script>
+{% endblock %}

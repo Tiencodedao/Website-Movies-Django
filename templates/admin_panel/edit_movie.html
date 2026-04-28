@@ -1,0 +1,97 @@
+{% extends 'admin_panel/base.html' %}{% load static %}
+{% block title %}Sửa phim - {{ movie.TenPhim }} - CinemaAdmin{% endblock %}
+{% block content %}
+<h1 class="title">Sửa phim</h1>
+<ul class="breadcrumbs">
+  <li><a href="{% url 'admin_dashboard' %}">Home</a></li>
+  <li class="divider">/</li>
+  <li><a href="{% url 'admin_movies' %}">Phim</a></li>
+  <li class="divider">/</li>
+  <li><a href="#" class="active">{{ movie.TenPhim }}</a></li>
+</ul>
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+<div class="form-card" style="margin-top:24px;">
+  <div class="form-card-header">
+    <i class='bx bx-edit-alt'></i>
+    <div>
+      <h3>Chỉnh sửa thông tin phim</h3>
+      <p>Cập nhật thông tin cho phim: <strong>{{ movie.TenPhim }}</strong></p>
+    </div>
+  </div>
+  <div class="form-card-body">
+
+    <!-- Preview ảnh hiện tại -->
+    {% if movie.Hinh %}
+    <div class="img-preview-box">
+      <img src="{% static 'admin/img/uploads/' %}{{ movie.Hinh }}" alt="{{ movie.TenPhim }}">
+      <div class="img-info">
+        <div class="img-name">Ảnh hiện tại</div>
+        <div class="img-sub">{{ movie.Hinh }}</div>
+        <div class="img-sub" style="margin-top:6px;color:#6b7280;">Upload ảnh mới để thay thế</div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="form-grid" style="margin-top:20px;">
+
+      <div class="form-group form-span-2">
+        <label class="form-label">{{ form.TenPhim.label }} <span class="req">*</span></label>
+        {{ form.TenPhim }}
+        {% if form.TenPhim.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.TenPhim.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ form.MaTL.label }} <span class="req">*</span></label>
+        {{ form.MaTL }}
+        {% if form.MaTL.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.MaTL.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ form.NgayKhoiChieu.label }}</label>
+        {{ form.NgayKhoiChieu }}
+        {% if form.NgayKhoiChieu.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.NgayKhoiChieu.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ form.ThoiLuong.label }}</label>
+        {{ form.ThoiLuong }}
+        {% if form.ThoiLuong.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.ThoiLuong.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ form.Trailer.label }}</label>
+        {{ form.Trailer }}
+        <span class="form-hint">VD: https://www.youtube.com/embed/abc123</span>
+        {% if form.Trailer.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.Trailer.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group form-span-2">
+        <label class="form-label">{{ form.MoTa.label }}</label>
+        {{ form.MoTa }}
+        {% if form.MoTa.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.MoTa.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">{{ form.Hinh.label }} <span style="font-weight:400;color:#9ca3af;">(tên file)</span></label>
+        {{ form.Hinh }}
+        {% if form.Hinh.errors %}<div class="form-error"><i class='bx bx-error-circle'></i>{{ form.Hinh.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Upload ảnh mới <span style="font-weight:400;color:#9ca3af;">(để trống nếu giữ ảnh cũ)</span></label>
+        <input type="file" name="hinh_file" accept="image/*" class="form-input" style="padding:7px;">
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <button type="submit" class="btn-save"><i class='bx bx-save'></i> Cập nhật</button>
+      <a href="{% url 'admin_movies' %}" class="btn-cancel"><i class='bx bx-x'></i> Hủy</a>
+      <a href="{% url 'admin_delete_movie' movie.MaPhim %}" class="btn-danger"><i class='bx bx-trash'></i> Xóa phim</a>
+    </div>
+  </div>
+</div>
+</form>
+{% endblock %}
