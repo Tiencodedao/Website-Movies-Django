@@ -1,36 +1,32 @@
-FROM php:8.2-apache
+FROM python:3.12-slim
 
-# Install system dependencies
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip
+    pkg-config \
+    default-libmysqlclient-dev \
+    gcc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd
+COPY . .
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+ENV SECRET_KEY=build-time-placeholder
+ENV DB_HOST=db
+ENV DB_NAME=cinema
+ENV DB_USER=root
+ENV DB_PASSWORD=123456
+RUN python manage.py collectstatic --noinput
 
-# Set working directory
-WORKDIR /var/www/html
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Copy application files
-COPY . /var/www/html
+EXPOSE 8000
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
-
-# Expose port 80
-EXPOSE 80
-
-# Start Apache
-CMD ["apache2-foreground"]
+ENTRYPOINT ["/entrypoint.sh"]

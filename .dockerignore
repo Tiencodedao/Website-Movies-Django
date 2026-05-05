@@ -1,9 +1,42 @@
+# .dockerignore — Không copy các file này vào Docker image
+# Giúp image nhỏ hơn + bảo mật hơn
+
+# ── Git ────────────────────────────────────
 .git
 .gitignore
+
+# ── Python cache ──────────────────────────
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+dist/
+build/
+
+# ── Môi trường ảo ─────────────────────────
+venv/
+env/
+.venv/
+.env/
+
+# ── File nhạy cảm ─────────────────────────
 .env
-*.md
-node_modules
-vendor
-.vscode
-.idea
-*.log
+*.env
+
+# ── Editor / IDE ──────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Test & temp ───────────────────────────
+*.sqlite3
+chair_test.html
+README.docker.md
+
+# ── OS files ──────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini

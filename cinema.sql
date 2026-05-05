@@ -66,7 +66,9 @@ CREATE TABLE `phim` (
   `MATL` int(11) NOT NULL,
   `NgayKhoiChieu` date DEFAULT NULL,
   `MoTa` text DEFAULT NULL,
-  `Hinh` text DEFAULT NULL
+  `Hinh` text DEFAULT NULL,
+  `Trailer` text DEFAULT NULL,
+  `ThoiLuong` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

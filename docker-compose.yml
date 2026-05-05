@@ -1,64 +1,88 @@
-version: '3.8'
-
 services:
-  # MySQL Database
+
   db:
     image: mysql:8.0
     container_name: cinema_db
     restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: cinema
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_USER: cinema_user
-      MYSQL_PASSWORD: cinema_pass
-    ports:
-      - "3306:3306"
+    env_file: .env.docker
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pRoot@Secure2024"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
       - db_data:/var/lib/mysql
-      - ./cinema.sql:/docker-entrypoint-initdb.d/cinema.sql
+      - ./cinema.sql:/docker-entrypoint-initdb.d/01_cinema.sql
+    ports:
+      - "3307:3306"
     networks:
       - cinema_network
 
-  # PHP Application
   web:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: cinema_web
     restart: unless-stopped
-    ports:
-      - "8080:80"
-    volumes:
-      - .:/var/www/html
+    env_file: .env.docker
     depends_on:
-      - db
-    environment:
-      DB_HOST: db
-      DB_NAME: cinema
-      DB_USER: cinema_user
-      DB_PASSWORD: cinema_pass
+      db:
+        condition: service_healthy
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    expose:
+      - "8000"
+    networks:
+      - cinema_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    image: nginx:alpine
+    container_name: cinema_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+    depends_on:
+      - web
     networks:
       - cinema_network
 
-  # phpMyAdmin
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: cinema_phpmyadmin
     restart: unless-stopped
-    ports:
-      - "8081:80"
     environment:
       PMA_HOST: db
+      PMA_PORT: 3306
       PMA_USER: root
-      PMA_PASSWORD: root_password
+      PMA_PASSWORD: Root@Secure2024
+    ports:
+      - "8080:80"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - cinema_network
 
 volumes:
   db_data:
+    name: cinema_db_data
+  static_volume:
+    name: cinema_static
+  media_volume:
+    name: cinema_media
 
 networks:
   cinema_network:
     driver: bridge
+    name: cinema_net
