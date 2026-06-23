@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from . import admin_views
+from . import api_views
 
 urlpatterns = [
     # ── CLIENT ─────────────────────────────────────────
@@ -55,4 +56,25 @@ urlpatterns = [
     path('admin-panel/genres/create/', admin_views.admin_create_genre, name='admin_create_genre'),
     path('admin-panel/genres/<int:genre_id>/edit/', admin_views.admin_edit_genre, name='admin_edit_genre'),
     path('admin-panel/genres/<int:genre_id>/delete/', admin_views.admin_delete_genre, name='admin_delete_genre'),
+
+    # ── MOBILE API ──────────────────────────────────────────────
+    # Auth
+    path('api/login/',            api_views.api_login,    name='api_login'),
+    path('api/register/',         api_views.api_register, name='api_register'),
+    path('api/me/',               api_views.api_me,       name='api_me'),
+
+    # Movies
+    path('api/movies/',                              api_views.api_movies,       name='api_movies'),
+    path('api/movies/<int:movie_id>/',               api_views.api_movie_detail, name='api_movie_detail'),
+    path('api/movies/<int:movie_id>/showtimes/',     api_views.api_showtimes,    name='api_showtimes'),
+
+    # Genres
+    path('api/genres/',                              api_views.api_genres,       name='api_genres'),
+
+    # Seats
+    path('api/showtimes/<int:showtime_id>/seats/',   api_views.api_seats,        name='api_seats'),
+
+    # Booking & Bills
+    path('api/booking/',                             api_views.api_booking,      name='api_booking'),
+    path('api/bills/<int:bill_id>/',                 api_views.api_bill_detail,  name='api_bill_detail'),
 ]

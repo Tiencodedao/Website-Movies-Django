@@ -14,10 +14,11 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./cinema.sql:/docker-entrypoint-initdb.d/01_cinema.sql
-    ports:
-      - "3307:3306"
+    # SECURITY: DB không expose port ra ngoài (chỉ dùng nội bộ qua backend network)
+    # ports:
+    #   - "3307:3306"   # Bỏ comment chỉ khi cần debug local
     networks:
-      - cinema_network
+      - backend       # DB chỉ nằm trong backend network — hoàn toàn ẩn với Nginx
 
   web:
     build:
@@ -35,7 +36,8 @@ services:
     expose:
       - "8000"
     networks:
-      - cinema_network
+      - frontend      # Nginx truy cập Django qua frontend
+      - backend       # Django truy cập MySQL qua backend
     logging:
       driver: "json-file"
       options:
@@ -55,7 +57,7 @@ services:
     depends_on:
       - web
     networks:
-      - cinema_network
+      - frontend      # Nginx chỉ nằm frontend — KHÔNG thấy DB
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -72,7 +74,7 @@ services:
       db:
         condition: service_healthy
     networks:
-      - cinema_network
+      - backend       # phpMyAdmin cần thấy DB (backend only)
 
 volumes:
   db_data:
@@ -83,6 +85,9 @@ volumes:
     name: cinema_media
 
 networks:
-  cinema_network:
+  frontend:
     driver: bridge
-    name: cinema_net
+    name: cinema_frontend
+  backend:
+    driver: bridge
+    name: cinema_backend

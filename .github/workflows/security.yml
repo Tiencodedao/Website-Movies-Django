@@ -1,0 +1,87 @@
+name: "Security Pipeline — DevSecOps"
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  trivy-scan:
+    name: "Trivy Security Scan"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout source code"
+        uses: actions/checkout@v4
+
+      - name: "Build Docker image"
+        run: docker build -t cinema-app:${{ github.sha }} .
+
+      - name: "Run Trivy vulnerability scanner"
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "cinema-app:${{ github.sha }}"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1"
+
+      - name: "Upload Trivy results to GitHub Security tab"
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-results.sarif"
+
+  docker-build-test:
+    name: "Docker Build & Smoke Test"
+    runs-on: ubuntu-latest
+    needs: trivy-scan
+
+    steps:
+      - name: "Checkout source code"
+        uses: actions/checkout@v4
+
+      - name: "Create .env.docker for test"
+        run: |
+          cat > .env.docker << EOF
+          SECRET_KEY=ci-test-secret-key-not-for-production
+          DEBUG=False
+          ALLOWED_HOSTS=localhost,127.0.0.1
+          DB_HOST=db
+          DB_NAME=cinema
+          DB_USER=root
+          DB_PASSWORD=Root@Secure2024
+          DB_PORT=3306
+          MYSQL_ROOT_PASSWORD=Root@Secure2024
+          MYSQL_DATABASE=cinema
+          EOF
+
+      - name: "Start services with Docker Compose"
+        run: docker compose up -d --build
+
+      - name: "Wait for services to be healthy"
+        run: |
+          echo "Waiting for Django to start..."
+          sleep 30
+          docker compose ps
+
+      - name: "Smoke test — check HTTP 200"
+        run: |
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" http://localhost:80 || echo "000")
+          echo "HTTP Status: $STATUS"
+          if [ "$STATUS" = "200" ] || [ "$STATUS" = "301" ] || [ "$STATUS" = "302" ]; then
+            echo "✅ App is running correctly"
+          else
+            echo "❌ App returned unexpected status: $STATUS"
+            docker compose logs web
+            exit 1
+          fi
+
+      - name: "Print container logs on failure"
+        if: failure()
+        run: docker compose logs
+
+      - name: "Tear down"
+        if: always()
+        run: docker compose down -v

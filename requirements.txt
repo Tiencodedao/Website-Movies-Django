@@ -1,6 +1,7 @@
 #Web Framework
 Django==6.0.4
 gunicorn==21.2.0
+whitenoise==6.9.0
 
 #Database 
 mysqlclient==2.2.8
@@ -14,3 +15,6 @@ python-dotenv==1.2.2
 #QR Code & Image
 qrcode==8.2
 Pillow==11.3.0
+
+#Mobile API — CORS cho Flutter
+django-cors-headers==4.3.1
