@@ -63,18 +63,14 @@ services:
     image: phpmyadmin:latest
     container_name: cinema_phpmyadmin
     restart: unless-stopped
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: Root@Secure2024
+    env_file: .env.docker
     ports:
       - "8080:80"
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - backend       # phpMyAdmin cần thấy DB (backend only)
+      - backend          # phpMyAdmin cần truy cập DB (backend only)
 
 volumes:
   db_data:
